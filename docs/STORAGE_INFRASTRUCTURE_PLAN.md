@@ -3,14 +3,179 @@
 
 **תאריך / Date:** 2025-12-10  
 **סטטוס / Status:** תכנון / Planning  
-**גרסה / Version:** 3.0 - ארכיטקטורת ארבעת העמודים  
-**מטרה / Goal:** הגדרת 4 עמודי תשתית עליהם נשען כל סוכן AI
+**גרסה / Version:** 4.0 - OWAL AI OS  
+**מטרה / Goal:** הגדרת סוכן AI קטן, חכם, נייד - כחלק ממערכת ההפעלה
+
+---
+
+## 🤖 OWAL AI OS - החזון / The Vision
+
+### העיקרון המנחה:
+```
+🐝 סוכנים קטנים, חכמים, זהים - כמו דבורים או דרונים קטנים
+   שבאים לתקן, לחזק, לשפר, ולייעל את העננים וחדרי המחשב
+```
+
+### מה זה OWAL AI OS?
+
+סוכן AI שהוא **חלק ממערכת ההפעלה של לינוקס**:
+- 🐳 רץ בדוקר קטן מאוד
+- 🧠 רק המוח מקומי - כל השאר בחוץ!
+- 📦 אפס תלות בנתונים משתנים
+- 🚀 התקנה מהירה - רק "שתול והפעל"
+- ♻️ בכל אתחול - מתחיל מחדש מהגיטהאב
+
+### היתרון הגדול:
+```
+┌────────────────────────────────────────────────────────────────┐
+│  כל הסוכנים זהים!                                             │
+│  הם יודעים מי הם ומה תפקידם רק מה-GitHub                       │
+│  = ניידות מלאה בין שרתים, עננים, ומיקומים                      │
+└────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🏗️ ארכיטקטורת OWAL AI OS
+
+```
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                           OWAL AI OS ARCHITECTURE                                │
+│                          ארכיטקטורת מערכת ההפעלה                                 │
+├──────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│                         ☁️ EXTERNAL RESOURCES (4 Pillars)                        │
+│    ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐              │
+│    │   PILLAR 1      │   │   PILLAR 2      │   │   PILLAR 3      │              │
+│    │   🗄️ Storj DB   │   │   📁 Google     │   │   🧠 GitHub     │              │
+│    │   (External DB) │   │   Drive         │   │   nervesys      │              │
+│    │                 │   │   (Archive)     │   │   (THE BRAIN)   │              │
+│    └────────┬────────┘   └────────┬────────┘   └────────┬────────┘              │
+│             │                     │                     │                        │
+│             └──────────────┬──────┴──────────┬──────────┘                        │
+│                            │                 │                                   │
+│                            ▼                 ▼                                   │
+│                   ┌─────────────────────────────────────┐                        │
+│                   │           PILLAR 4                  │                        │
+│                   │         📊 GRAFANA                  │                        │
+│                   │     (Monitoring & Actions)          │                        │
+│                   └─────────────────────────────────────┘                        │
+│                                                                                  │
+│  ═══════════════════════════════════════════════════════════════════════════    │
+│                                                                                  │
+│                         🖥️ LOCAL SERVER (Linux)                                  │
+│    ┌────────────────────────────────────────────────────────────────────────┐   │
+│    │                        🐳 DOCKER CONTAINER                             │   │
+│    │                          (Ultra Lightweight)                           │   │
+│    │   ┌────────────────────────────────────────────────────────────────┐   │   │
+│    │   │                    🤖 OWAL AI AGENT                            │   │   │
+│    │   │                                                                │   │   │
+│    │   │   ┌──────────────┐                                             │   │   │
+│    │   │   │  🧠 BRAIN    │  ← Only this runs locally!                  │   │   │
+│    │   │   │  (AI Model)  │                                             │   │   │
+│    │   │   └──────────────┘                                             │   │   │
+│    │   │                                                                │   │   │
+│    │   │   On Boot:                                                     │   │   │
+│    │   │   1. git pull nervesys → Who am I? What's my role?            │   │   │
+│    │   │   2. Connect to Storj → Where's my data?                      │   │   │
+│    │   │   3. Start working → Fix, Improve, Monitor                    │   │   │
+│    │   │                                                                │   │   │
+│    │   └────────────────────────────────────────────────────────────────┘   │   │
+│    └────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🐝 הסוכן הקטן - מפרט / The Tiny Agent Spec
+
+### עקרונות הליבה:
+
+| עיקרון | תיאור | יתרון |
+|--------|-------|-------|
+| **Stateless** | אין מצב מקומי קבוע | ניידות מלאה |
+| **Identical** | כל הסוכנים זהים בקוד | קל לתחזוקה |
+| **GitOps** | הכל מגיע מה-GitHub | עדכון מרכזי |
+| **Containerized** | דוקר קטן במיוחד | התקנה מהירה |
+| **Self-Aware** | יודע מי הוא מה-Config | גמישות |
+
+### מה נמצא בדוקר:
+```dockerfile
+# OWAL AI OS - Ultra Lightweight Container
+FROM python:3.11-alpine
+
+# Only the brain - everything else is external!
+COPY brain/ /app/brain/
+COPY bootstrap.sh /app/
+
+# Minimal dependencies for cloud connectivity
+RUN pip install --no-cache-dir requests boto3 gitpython
+
+# On start: pull config, connect, work
+ENTRYPOINT ["/app/bootstrap.sh"]
+```
+
+### גודל הדוקר המטרה:
+```
+🎯 Target: < 100MB total
+   - Base image: ~50MB (python:3.11-alpine)
+   - Brain: ~30MB (optional: TinyLlama-1.1B-GGUF or Phi-2-GGUF)
+   - Scripts: ~1MB
+   - Dependencies: ~19MB
+
+Note: Brain model is optional - can use Alibaba Cloud API instead
+```
+
+---
+
+## 🔄 מחזור החיים של הסוכן / Agent Lifecycle
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         OWAL AI AGENT LIFECYCLE                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  1️⃣ BIRTH (התקנה)                                                          │
+│     └── docker run owalai/agent                                             │
+│         └── Container starts with ZERO knowledge                            │
+│                                                                             │
+│  2️⃣ AWAKENING (יקיצה)                                                       │
+│     └── bootstrap.sh runs:                                                  │
+│         ├── git clone/pull https://github.com/bitonpro/nervesys            │
+│         ├── Read config/agents/{AGENT_ID}.yaml                              │
+│         │   └── AGENT_ID = env var or hostname or auto-generated UUID      │
+│         │   └── "Now I know who I am and what to do!"                      │
+│         ├── Connect to Storj (credentials from config)                      │
+│         └── Register with Grafana                                           │
+│                                                                             │
+│  3️⃣ WORKING (עבודה)                                                         │
+│     └── Agent runs its assigned tasks:                                      │
+│         ├── Monitor system metrics                                          │
+│         ├── Analyze logs (Edge AI)                                          │
+│         ├── Send heartbeats to Grafana                                      │
+│         ├── Upload data to Storj                                            │
+│         └── Archive to Google Drive (daily)                                 │
+│                                                                             │
+│  4️⃣ SLEEP/RESTART (שינה/אתחול)                                              │
+│     └── On restart:                                                         │
+│         └── Goes back to step 2 (AWAKENING)                                 │
+│         └── Fresh start - no local state to corrupt!                        │
+│                                                                             │
+│  5️⃣ MIGRATION (הגירה)                                                       │
+│     └── Moving to new server:                                               │
+│         ├── docker stop on old server                                       │
+│         ├── docker run on new server                                        │
+│         └── Same agent, new home - works instantly!                         │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## 🏛️ ארבעת העמודים / The Four Pillars
 
-הסוכן הרזה נשען על **4 עמודים חיצוניים** - אין לו כלום מקומית!
+הסוכן נשען על **4 עמודים חיצוניים** - אין לו כלום מקומית!
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────┐
@@ -381,25 +546,42 @@ Normal → Archive to Google Drive
 
 ## ⏭️ הצעדים הבאים
 
-### מיידי:
-1. ✅ אשר את מבנה 4 העמודים
-2. צור Bucket `owalai-production` ב-Storj
-3. הגדר תיקייה ב-Google Drive
-4. התקן Grafana (או השתמש ב-Grafana Cloud)
+### שלב 0: יצירת הדוקר (OWAL AI OS Base)
+1. ✅ אשר את ארכיטקטורת OWAL AI OS
+2. צור Dockerfile בסיסי (< 100MB)
+3. צור bootstrap.sh script
+4. בדוק התקנה מהירה
 
-### שבוע 1:
-5. צור מבנה ב-nervesys (config, state, dashboards)
-6. כתוב bootstrap.sh
-7. חבר Alibaba Cloud API (אופציונלי)
+### שלב 1: הגדרת 4 העמודים
+5. צור Bucket `owalai-production` ב-Storj
+6. הגדר תיקייה ב-Google Drive
+7. צור מבנה config ב-nervesys
+8. התקן Grafana
 
-### שבוע 2:
-8. הגדר Grafana dashboards
-9. הגדר alerts
-10. בדיקות E2E
+### שלב 2: חיבור הסוכן לעמודים
+9. כתוב קוד חיבור ל-Storj (S3)
+10. כתוב קוד חיבור ל-Google Drive
+11. הגדר Grafana dashboards
+12. בדיקות E2E
+
+### שלב 3: פריסה
+13. פרוס את הסוכן הראשון
+14. בדוק ניידות בין שרתים
+15. הוסף עוד סוכנים
 
 ---
 
-**סיכום:** הסוכן נשען על 4 עמודים חיצוניים:
+**סיכום - OWAL AI OS:**
+
+🐝 **סוכנים קטנים, חכמים, זהים** - כמו דרונים קטנים שבאים לתקן, לחזק, ולשפר!
+
+**עקרונות:**
+- ✅ **Stateless** - אין מצב מקומי, הכל בחוץ
+- ✅ **Identical** - כל הסוכנים זהים בקוד
+- ✅ **Portable** - ניידות מלאה בין שרתים ועננים
+- ✅ **GitOps** - הכל מגיע מהגיטהאב בכל אתחול
+
+**4 עמודים חיצוניים:**
 1. **Storj** = DB פעיל
 2. **Google Drive** = ארכיון איטי
 3. **GitHub nervesys** = המוח (config + state)
@@ -409,4 +591,4 @@ Normal → Archive to Google Drive
 
 ---
 
-*נוצר על ידי GitHub Copilot עבור פרויקט Nervesys - גרסה 3.0*
+*נוצר על ידי GitHub Copilot עבור פרויקט Nervesys - גרסה 4.0 (OWAL AI OS)*
