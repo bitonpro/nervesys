@@ -3,7 +3,7 @@
 
 **תאריך / Date:** 2025-12-10  
 **סטטוס / Status:** תכנון / Planning  
-**גרסה / Version:** 4.0 - OWAL AI OS  
+**גרסה / Version:** 4.1 - OWAL AI OS + Proxmox Integration  
 **מטרה / Goal:** הגדרת סוכן AI קטן, חכם, נייד - כחלק ממערכת ההפעלה
 
 ---
@@ -505,8 +505,165 @@ Normal → Archive to Google Drive
 | **3** | 🧠 Brain | GitHub nervesys | Config + State + Code | On startup + periodic |
 | **4** | 📊 Monitor | Grafana | Dashboards + Alerts + Actions | Continuous |
 
-### + Bonus:
+### + Bonus Integrations:
 | **+** | 🤖 AI | Alibaba Cloud | Edge Analysis + Reports | On-demand |
+| **+** | 🖥️ Hypervisor | Proxmox VE | VM/Container Management | Continuous |
+
+---
+
+## 🖥️ Proxmox VE - אינטגרציה / Integration
+
+**שאלה:** האם Proxmox עם ה-API שלו משתלב בתוכנית?
+
+### ✅ כן! Proxmox הוא חלק מרכזי בתשתית!
+
+### מה זה Proxmox?
+- פלטפורמת וירטואליזציה קוד פתוח
+- מנהל VMs ו-LXC Containers
+- **יש לו API מלא** לניהול אוטומטי
+- תומך באינטגרציה עם AI
+
+### איך זה משתלב:
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                    PROXMOX + OWAL AI OS INTEGRATION                      │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│   ┌─────────────────────────────────────────────────────────────────┐   │
+│   │                    PROXMOX VE CLUSTER                           │   │
+│   │   ┌───────────────┐  ┌───────────────┐  ┌───────────────┐      │   │
+│   │   │   Node 1      │  │   Node 2      │  │   Node 3      │      │   │
+│   │   │ ┌───────────┐ │  │ ┌───────────┐ │  │ ┌───────────┐ │      │   │
+│   │   │ │ 🤖 OWAL   │ │  │ │ 🤖 OWAL   │ │  │ │ 🤖 OWAL   │ │      │   │
+│   │   │ │  Agent    │ │  │ │  Agent    │ │  │ │  Agent    │ │      │   │
+│   │   │ └───────────┘ │  │ └───────────┘ │  │ └───────────┘ │      │   │
+│   │   │   VMs/LXCs    │  │   VMs/LXCs    │  │   VMs/LXCs    │      │   │
+│   │   └───────────────┘  └───────────────┘  └───────────────┘      │   │
+│   └─────────────────────────────────────────────────────────────────┘   │
+│                                    │                                     │
+│                                    ▼                                     │
+│                          ┌─────────────────┐                             │
+│                          │  Proxmox API    │                             │
+│                          │  (Port 8006)    │                             │
+│                          └────────┬────────┘                             │
+│                                   │                                      │
+│         ┌─────────────────────────┼─────────────────────────┐           │
+│         ▼                         ▼                         ▼           │
+│   ┌───────────┐            ┌───────────┐            ┌───────────┐       │
+│   │  Grafana  │            │  OWAL AI  │            │  Alibaba  │       │
+│   │  Monitor  │            │  Agent    │            │  Cloud    │       │
+│   └───────────┘            └───────────┘            └───────────┘       │
+│                                                                          │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### מה הסוכן יכול לעשות עם Proxmox API:
+
+| פעולה | API Endpoint | תיאור |
+|-------|--------------|-------|
+| **Monitor VMs** | `GET /api2/json/nodes/{node}/qemu` | מעקב אחר כל ה-VMs |
+| **Monitor Containers** | `GET /api2/json/nodes/{node}/lxc` | מעקב אחר LXC containers |
+| **Get Metrics** | `GET /api2/json/nodes/{node}/status` | CPU, RAM, Disk של כל Node |
+| **Create VM** | `POST /api2/json/nodes/{node}/qemu` | יצירת VM חדש |
+| **Start VM** | `POST .../qemu/{vmid}/status/start` | הפעלת VM |
+| **Stop VM** | `POST .../qemu/{vmid}/status/stop` | כיבוי VM |
+| **Migrate** | `POST /api2/json/nodes/{node}/qemu/{vmid}/migrate` | העברה בין Nodes |
+| **Backup** | `POST /api2/json/nodes/{node}/vzdump` | גיבוי אוטומטי |
+
+### הגדרה ב-nervesys:
+```yaml
+# config/proxmox.yaml
+# Note: Store API token securely - never commit to Git!
+proxmox:
+  enabled: true
+  clusters:
+    - name: "main-cluster"
+      api_url: "https://proxmox.example.com:8006"  # Replace with your domain
+      api_token: "${PROXMOX_API_TOKEN}"            # From environment/vault
+      verify_ssl: true
+      
+  monitoring:
+    enabled: true
+    interval_seconds: 60
+    metrics:
+      - cpu_usage
+      - memory_usage
+      - disk_usage
+      - network_io
+      - vm_status
+      
+  actions:
+    auto_migrate_on_overload: true
+    auto_backup_daily: true
+    alert_on_vm_down: true
+    
+  integration:
+    grafana: true           # שלח מדדים ל-Grafana
+    storj: true             # גבה ל-Storj
+    alibaba_analysis: true  # נתח עם AI
+```
+
+### Use Cases עם Proxmox:
+
+#### 1️⃣ ניטור אוטומטי (Monitoring)
+```
+OWAL Agent on Proxmox Node
+    ↓
+Calls Proxmox API every minute
+    ↓
+Gets: CPU, RAM, Disk, VMs status
+    ↓
+Sends to: Grafana (real-time) + Storj (archive)
+```
+
+#### 2️⃣ תגובה אוטומטית (Auto-Response)
+```
+Grafana Alert: "Node 1 CPU > 90%"
+    ↓
+OWAL Agent receives alert
+    ↓
+Calls Proxmox API: Migrate VM to Node 2
+    ↓
+Reports action to Storj + Google Drive
+```
+
+#### 3️⃣ גיבוי חכם (Smart Backup)
+```
+Daily at 3:00 AM:
+    ↓
+OWAL Agent calls Proxmox vzdump API
+    ↓
+Backup created locally
+    ↓
+Upload to Storj (compressed)
+    ↓
+Delete local backup
+    ↓
+Report to Google Drive
+```
+
+#### 4️⃣ ניתוח AI (AI Analysis)
+```
+OWAL Agent collects Proxmox metrics
+    ↓
+Sends to Alibaba Cloud AI
+    ↓
+AI analyzes: "Node 2 will run out of disk in 3 days"
+    ↓
+Alert to Grafana + Recommendation to admin
+```
+
+### פלטפורמות נוספות עם API דומה:
+
+| פלטפורמה | API | תמיכה |
+|----------|-----|-------|
+| **Proxmox VE** | REST API | ✅ מלאה |
+| **VMware vSphere** | REST API | ✅ אפשרי |
+| **XCP-ng** | REST API | ✅ אפשרי |
+| **oVirt** | REST API | ✅ אפשרי |
+| **OpenStack** | REST API | ✅ אפשרי |
+| **Kubernetes** | REST API | ✅ אפשרי |
 
 ---
 
@@ -569,6 +726,11 @@ Normal → Archive to Google Drive
 14. בדוק ניידות בין שרתים
 15. הוסף עוד סוכנים
 
+### שלב 4: אינטגרציית Proxmox
+16. חבר ל-Proxmox API
+17. הגדר ניטור VMs/Containers
+18. הגדר פעולות אוטומטיות (migrate, backup)
+
 ---
 
 **סיכום - OWAL AI OS:**
@@ -587,8 +749,10 @@ Normal → Archive to Google Drive
 3. **GitHub nervesys** = המוח (config + state)
 4. **Grafana** = עיניים + פעולות
 
-**+ Alibaba Cloud** (אופציונלי) = AI לניתוח ודוחות
+**+ אינטגרציות נוספות:**
+- **Alibaba Cloud** = AI לניתוח ודוחות
+- **Proxmox VE** = ניהול VMs/Containers דרך API
 
 ---
 
-*נוצר על ידי GitHub Copilot עבור פרויקט Nervesys - גרסה 4.0 (OWAL AI OS)*
+*נוצר על ידי GitHub Copilot עבור פרויקט Nervesys - גרסה 4.1 (OWAL AI OS + Proxmox)*
