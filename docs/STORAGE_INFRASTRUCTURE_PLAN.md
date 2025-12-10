@@ -3,274 +3,424 @@
 
 **תאריך / Date:** 2025-12-10  
 **סטטוס / Status:** תכנון / Planning  
+**גרסה / Version:** 2.0 - ארכיטקטורת "הסוכן הרזה"  
 **מטרה / Goal:** הגדרת מאגר נתונים (DB) ומערכת לוגים חיצונית לכל סוכני ה-AI
 
 ---
 
-## 🎯 מטרות / Objectives
+## 🎯 עקרון מנחה: "הסוכן הרזה" (The Lean Agent)
 
-1. **מאגר נתונים (Database)** - מקום מרכזי לשמירת מידע, היסטוריה, והחלטות של כל AI
-2. **מערכת לוגים (Logging)** - תיעוד פעולות, שגיאות, ותקשורת בין הסוכנים
-3. **אחסון חיצוני** - שמירת קבצים, מסמכים, וגיבויים
+**המטרה:** הסוכן שוקל כמעט כלום. אין לו DB כבד מקומי. הוא רק "צינור" שמעביר מידע החוצה.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        LEAN AGENT ARCHITECTURE                          │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│   ┌─────────────┐    git pull     ┌─────────────────────────────────┐  │
+│   │   GitHub    │◄───────────────►│  Agent (AIGARDEN01 / Server)    │  │
+│   │  nervesys   │   Config/Brain  │  ┌─────────────────────────┐    │  │
+│   └─────────────┘                 │  │  SQLite Buffer (≤100MB) │    │  │
+│                                   │  └───────────┬─────────────┘    │  │
+│   ┌─────────────┐                 │              │                  │  │
+│   │   Storj     │◄────────────────│──────────────┤ Upload & Delete  │  │
+│   │  (Archive)  │   GZIP Logs     │              │ Every 10 min     │  │
+│   └─────────────┘                 │              │                  │  │
+│                                   │              ▼                  │  │
+│   ┌─────────────┐                 │  ┌─────────────────────────┐    │  │
+│   │ Orchestrator│◄────────────────│──│    Heartbeat/Status     │    │  │
+│   │  Postgres   │   Real-time     │  │  (CPU, RAM, Alerts)     │    │  │
+│   └─────────────┘                 │  └─────────────────────────┘    │  │
+│                                   └─────────────────────────────────┘  │
+│   ┌─────────────┐                                                      │
+│   │Google Drive │◄──────────────── Daily PDF/Excel Reports             │
+│   │  (Reports)  │                                                      │
+│   └─────────────┘                                                      │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 🔍 השוואת אפשרויות / Options Comparison
+## 🧠 שכבה 1: המוח וההגדרות (GitHub - Nervesys)
 
-### אפשרות 1: Storj (מומלץ! ✅)
-**קישור:** https://eu1.storj.io
+**השיטה:** GitOps - הסוכן לא מחזיק לוגיקה קשיחה. הוא מושך אותה.
 
-| יתרון | תיאור |
-|-------|-------|
-| ✅ **מבוזר** | אחסון מבוזר - אמינות גבוהה |
-| ✅ **S3 Compatible** | תואם AWS S3 API - קל לאינטגרציה |
-| ✅ **הצפנה** | הצפנה מקצה לקצה |
-| ✅ **עלות** | זול יותר מ-AWS/GCP |
-| ✅ **יש לך מנוי** | כבר יש לך חשבון פעיל! |
-
-**מבנה מומלץ ב-Storj:**
+### הפעולה:
+כשסוכן (Agent) עולה ב-AIGARDEN01 או בכל מקום אחר:
+```bash
+git pull https://github.com/bitonpro/nervesys
 ```
-nervesys-bucket/
-├── databases/
-│   ├── grok/
-│   ├── deepseek/
-│   ├── gimai/
-│   ├── chatgpt/
-│   └── copilot/
+
+### מה הסוכן מקבל:
+- **Config** - מי אני? מה התפקיד שלי?
+- **Thresholds** - מה הספים להתראה?
+- **Rules** - כללי התנהגות ולוגיקה
+
+### היתרון:
+✅ שינוי אחד בגיטהאב מעדכן את **כל** החווה!
+
+### מבנה Config מוצע ב-nervesys:
+```
+nervesys/
+├── config/
+│   ├── agents/
+│   │   ├── grok.yaml
+│   │   ├── deepseek.yaml
+│   │   ├── gimai.yaml
+│   │   ├── chatgpt.yaml
+│   │   └── copilot.yaml
+│   ├── thresholds.yaml       # ספים להתראות
+│   ├── orchestrator.yaml     # הגדרות Orchestrator
+│   └── storage.yaml          # הגדרות Storj/Google Drive
+└── scripts/
+    ├── agent_bootstrap.sh    # סקריפט אתחול סוכן
+    └── sync_config.sh        # סנכרון הגדרות
+```
+
+---
+
+## 💾 שכבה 2: זיכרון לטווח קצר (SQLite / RAM Buffer)
+
+**המטרה:** סוכן AI צריך לזכור מה קרה לפני דקה. אבל **אסור** לו לתפוס מקום.
+
+### הפתרון:
+שימוש ב-**SQLite** (קובץ בודד) או **In-Memory DB**
+
+### הפעולה:
+```
+הסוכן רושם לוגים ונתונים לקובץ זמני מקומי:
+/tmp/agent/buffer.db
+```
+
+### 🚨 החוק הקדוש:
+```
+הקובץ הזה לעולם לא עובר גודל של 100MB!
+אם הוא מתמלא → הוא נשלח החוצה ונמחק.
+```
+
+### מבנה טבלת Buffer:
+```sql
+CREATE TABLE logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    level TEXT,           -- INFO, WARN, ERROR, CRITICAL
+    agent_id TEXT,
+    action TEXT,
+    message TEXT,
+    context TEXT,         -- JSON stored as TEXT (SQLite 3.9+ has JSON1 extension)
+    uploaded INTEGER DEFAULT 0
+);
+
+-- Index for quick queries
+CREATE INDEX idx_uploaded ON logs(uploaded);
+CREATE INDEX idx_timestamp ON logs(timestamp);
+CREATE INDEX idx_agent_time ON logs(agent_id, timestamp);
+```
+
+**הערה:** SQLite 3.9+ תומך ב-JSON1 extension. אם משתמשים בגרסה ישנה יותר, הנתונים נשמרים כ-TEXT.
+
+---
+
+## 📦 שכבה 3: זיכרון לטווח ארוך (Storj - Archive)
+
+**המטרה:** זה ה"מחסן" - כל ההיסטוריה נשמרת כאן.
+
+### הבאקט (Bucket):
+```
+שם: owalai-production
+אזור: EU1 (כפי שמופיע בקישור שלך)
+```
+
+### מבנה הארכיון:
+```
+owalai-production/
 ├── logs/
-│   ├── system/
-│   ├── errors/
-│   └── activity/
+│   ├── AIGARDEN01/
+│   │   ├── 2025-12-10/
+│   │   │   ├── 00-00.json.gz
+│   │   │   ├── 00-10.json.gz
+│   │   │   └── ...
+│   │   └── 2025-12-11/
+│   └── AIGARDEN02/
 ├── backups/
 │   └── daily/
-└── shared/
-    └── knowledge-base/
+└── configs/
+    └── snapshots/
 ```
 
-### אפשרות 2: Google Drive
-| יתרון | חסרון |
-|-------|-------|
-| ✅ ממשק ידידותי | ❌ API מוגבל |
-| ✅ שיתוף קל | ❌ לא מתאים ל-DB |
-| ✅ חינמי עד 15GB | ❌ לא S3 compatible |
-
-**מסקנה:** Google Drive מתאים לגיבוי מסמכים, לא לבסיס נתונים פעיל.
-
-### אפשרות 3: פתרון משולב (Best Practice ⭐)
+### הפעולה (כל 10 דקות או 10MB):
 ```
-┌──────────────────────────────────────────────────────┐
-│                    NERVESYS                          │
-├──────────────────────────────────────────────────────┤
-│  Storj (Primary)          │  Google Drive (Backup)  │
-│  ├── Database files       │  ├── Documents          │
-│  ├── Real-time logs       │  ├── Reports            │
-│  └── Active storage       │  └── Archives           │
-└──────────────────────────────────────────────────────┘
+1. הסוכן צובר לוגים ב-SQLite
+2. הסוכן דוחס אותם (GZIP) - הקטנה של ~90%!
+3. הסוכן שולח (Upload) ל-Storj דרך פרוטוקול S3
+4. הסוכן מוחק את הקובץ המקומי
+```
+
+### ✅ התוצאה:
+**הדיסק של השרת המקומי נשאר ריק תמיד!**
+
+### Environment Variables:
+```bash
+# Storj Configuration
+STORJ_ACCESS_KEY=<your-access-key>
+STORJ_SECRET_KEY=<your-secret-key>
+STORJ_BUCKET=owalai-production
+STORJ_ENDPOINT=https://gateway.storjshare.io
+STORJ_REGION=eu1
 ```
 
 ---
 
-## 📊 שלב 1: בחירת בסיס נתונים / Database Selection
+## ⚡ שכבה 4: מצב בזמן אמת (Postgres ב-Orchestrator)
 
-### אפשרויות מומלצות:
+**המטרה:** Storj זה לארכיון (היסטוריה). ה-AI המרכזי צריך לדעת מה קורה **עכשיו**.
 
-#### 1️⃣ SQLite + Storj (פשוט ביותר)
-```
-יתרונות:
-- ✅ קובץ בודד - קל לגבות
-- ✅ אין צורך בשרת
-- ✅ מושלם להתחלה
-
-חסרונות:
-- ❌ לא מתאים לגישה במקביל
-```
-
-#### 2️⃣ PostgreSQL + Supabase (מומלץ לסביבת ייצור)
-```
-יתרונות:
-- ✅ מנוהל בענן
-- ✅ API מובנה
-- ✅ Real-time capabilities
-- ✅ Free tier זמין
-
-חסרונות:
-- ❌ יותר מורכב להתקנה
-```
-
-#### 3️⃣ MongoDB Atlas (NoSQL)
-```
-יתרונות:
-- ✅ גמיש - מתאים ללוגים
-- ✅ Free tier 512MB
-
-חסרונות:
-- ❌ פחות מתאים לנתונים מובנים
-```
-
-### המלצה: התחל עם SQLite + Storj, שדרג ל-Supabase כשצריך
-
----
-
-## 📝 שלב 2: מבנה הלוגים / Logging Structure
-
-### מבנה לוג מוצע:
+### הפעולה:
+הסוכן שולח **"דופק" (Heartbeat)** וסטטוס קריטי:
 ```json
 {
-  "timestamp": "2025-12-10T19:30:00Z",
   "agent_id": "GROK",
-  "level": "INFO|WARN|ERROR|DEBUG",
-  "action": "code_review",
-  "message": "Reviewed PR #42",
-  "context": {
-    "repository": "nervesys",
-    "file": "main.py",
-    "duration_ms": 1234
+  "server": "AIGARDEN01",
+  "timestamp": "2025-12-10T19:45:00Z",
+  "status": "healthy",
+  "metrics": {
+    "cpu_percent": 45.2,
+    "ram_percent": 62.1,
+    "disk_percent": 23.4,
+    "buffer_size_mb": 12.5
   },
-  "metadata": {
-    "model_version": "latest",
-    "tokens_used": 500
-  }
+  "alerts": [],
+  "last_action": "code_review",
+  "uptime_seconds": 86400
 }
 ```
 
-### קטגוריות לוגים:
-| קטגוריה | תיאור | שמירה |
-|---------|-------|-------|
-| `system` | אתחול, כיבוי, שגיאות קריטיות | 90 יום |
-| `activity` | פעולות שוטפות | 30 יום |
-| `errors` | שגיאות ואזהרות | 180 יום |
-| `audit` | פעולות רגישות | שנה |
+### זה נשמר ב-Postgres המרכזי (OVH):
+```sql
+CREATE TABLE agent_status (
+    id SERIAL PRIMARY KEY,
+    agent_id VARCHAR(50),
+    server VARCHAR(100),
+    timestamp TIMESTAMPTZ DEFAULT NOW(),
+    status VARCHAR(20),
+    metrics JSONB,
+    alerts JSONB,
+    last_action VARCHAR(100),
+    uptime_seconds INTEGER
+);
 
----
-
-## 🛠️ שלב 3: תוכנית יישום / Implementation Plan
-
-### שבוע 1: הכנה
-- [ ] הגדרת Bucket ב-Storj
-- [ ] יצירת Access Keys
-- [ ] בדיקת חיבור בסיסי
-
-### שבוע 2: בסיס נתונים
-- [ ] יצירת סכמת DB
-- [ ] טבלאות עבור כל AI agent
-- [ ] הגדרת גיבויים אוטומטיים
-
-### שבוע 3: מערכת לוגים
-- [ ] יצירת מודול logging
-- [ ] הגדרת רמות לוגים
-- [ ] בדיקות
-
-### שבוע 4: אינטגרציה
-- [ ] חיבור כל הסוכנים למערכת
-- [ ] בדיקות E2E
-- [ ] תיעוד
-
----
-
-## 🔧 שלב 4: הגדרות Storj / Storj Setup
-
-### 4.1 יצירת Bucket
-```
-שם: nervesys-storage
-אזור: EU1 (כפי שמופיע בקישור שלך)
-הצפנה: Server-side + Client-side (מומלץ)
-```
-
-### 4.2 Access Grants
-צור שני Access Grants נפרדים:
-1. **nervesys-db-access** - גישה מלאה ל-databases/
-2. **nervesys-logs-access** - גישה לכתיבה ל-logs/
-
-### 4.3 Environment Variables (לעתיד)
-```
-STORJ_ACCESS_GRANT=<your-access-grant>
-STORJ_BUCKET=nervesys-storage
-STORJ_ENDPOINT=https://gateway.storjshare.io
+-- Index for real-time queries
+CREATE INDEX idx_agent_status_time ON agent_status(agent_id, timestamp DESC);
 ```
 
 ---
 
-## 💡 שלב 5: עצות לשיפור / Improvement Tips
+## 📊 שכבה 5: דוחות מנהלים (Google Drive)
 
-### 🔐 אבטחה
-1. **הפרדת הרשאות** - כל AI מקבל גישה רק למה שהוא צריך
-2. **הצפנת נתונים** - השתמש ב-encryption של Storj
-3. **Audit trail** - תעד כל גישה לנתונים
-4. **גיבוי כפול** - Storj + Google Drive למסמכים חשובים
+**הכלל:** אל תשתמש ב-Drive ללוגים. תשתמש בו לדוחות אנושיים!
 
-### 📈 ביצועים
-1. **Caching** - שמור נתונים נפוצים מקומית
-2. **Batch writes** - כתוב לוגים באצוות, לא אחד-אחד
-3. **Compression** - דחוס לוגים ישנים
-4. **Retention policy** - מחק לוגים ישנים אוטומטית
+### הפעולה:
+ה-**Orchestrator** מייצר בסוף יום:
+- דוח PDF מסכם
+- Excel עם נתונים
+- גרפים ותרשימים
 
-### 🔄 אמינות
-1. **Health checks** - בדוק חיבור ל-Storj מדי שעה
-2. **Retry logic** - נסה שוב אם הכתיבה נכשלה
-3. **Fallback** - אם Storj לא זמין, שמור מקומית זמנית
-4. **Monitoring** - התראות על שגיאות
+### מבנה ב-Google Drive:
+```
+OWAL AI Reports/
+├── Daily/
+│   ├── 2025-12-10_summary.pdf
+│   ├── 2025-12-10_metrics.xlsx
+│   └── ...
+├── Weekly/
+│   └── Week_50_2025.pdf
+└── Alerts/
+    └── Critical_2025-12-10.pdf
+```
 
-### 🤝 שיתוף פעולה בין AI
-1. **Shared knowledge base** - מאגר ידע משותף לכל הסוכנים
-2. **Communication logs** - תיעוד תקשורת בין סוכנים
-3. **Task history** - היסטוריית משימות
-4. **Learning from errors** - למידה משגיאות עבר
+### היתרון:
+✅ קריאה אנושית נוחה
+✅ שיתוף קל עם הצוות
+✅ לא עומס על המערכת
 
 ---
 
-## 📁 שלב 6: מבנה קבצים מוצע לפרויקט
+## 🛠️ Best Practices - עצות לשיפור
+
+### 1️⃣ דחיסה לפני שליחה (Compression)
+```
+❌ לעולם אל תשלח טקסט (Log) גולמי ל-Storj!
+✅ הסוכן צריך לדחוס ל-GZIP לפני השליחה
+📉 זה מקטין את הנפח ב-90%!
+```
+
+### 2️⃣ Zero-Config Agent
+```
+הסוכן לא צריך לדעת כלום כשהוא מותקן חוץ מ-Token אחד!
+
+עם הטוקן הזה הוא:
+1. הולך ל-Orchestrator
+2. מקבל את ה-Storj Credentials
+3. מקבל את ה-Git Config
+4. מתחיל לעבוד!
+```
+
+### 3️⃣ Buffer למקרה של נתק
+```
+אם האינטרנט נופל, הסוכן לא קורס!
+
+הסוכן:
+1. ממשיך לכתוב ל-SQLite המקומי
+2. ברגע שהרשת חוזרת
+3. "מקיא" את כל המידע ל-Storj
+4. מתרוקן
+```
+
+### 4️⃣ Edge AI - לוגיקה חכמה
+```
+לפני שהסוכן שולח לוג שגיאה ל-Storj:
+
+ה-AI הקטן המקומי מנתח אותו:
+- אם זה קריטי → התראה מיידית ל-API
+- אם זה סתם "Info" → זה הולך לארכיון ב-Storj
+
+אפשרויות מודל Edge:
+- TinyLlama 1.1B (מומלץ - קל וחזק)
+- Phi-2 (Microsoft)
+- או כל מודל GGUF קטן
+```
+
+---
+
+## 📋 סיכום הפעולה המיידית
+
+### שלב 1: Storj
+```bash
+# צור Bucket בשם owalai-production
+# צור Access Key ו-Secret Key
+# שמור אותם במקום בטוח!
+```
+
+### שלב 2: Orchestrator
+```bash
+# הכנס את המפתחות ל-Vault
+# (ב-docker-compose של השרת הראשי)
+```
+
+### שלב 3: Agent
+```bash
+# עדכן את הסקריפט:
+# - לא לשמור לוגים מקומית לנצח
+# - Upload & Delete ל-Storj כל 10 דקות
+```
+
+---
+
+## 🔄 הפתרון המשולש - סיכום
+
+| שכבה | מטרה | טכנולוגיה | תדירות |
+|------|------|-----------|---------|
+| **1. Real-time** | מה קורה עכשיו | Postgres (Orchestrator) | כל דקה (Heartbeat) |
+| **2. Archive** | היסטוריה ולוגים | Storj (S3) | כל 10 דק / 10MB |
+| **3. Reports** | קריאה אנושית | Google Drive | יומי |
+
+### תרשים זרימה:
+```
+Agent Local          →  Orchestrator API  →  Postgres (Real-time)
+     ↓
+SQLite Buffer (≤100MB)
+     ↓
+GZIP Compress
+     ↓
+Storj Upload (Archive)
+     ↓
+Local Delete
+     ↓
+Orchestrator generates  →  Google Drive (Daily Reports)
+```
+
+---
+
+## 📁 מבנה קבצים מוצע לפרויקט
 
 ```
 nervesys/
-├── CONTRIBUTORS.json          # קיים
+├── CONTRIBUTORS.json              # AI Collaborators
 ├── docs/
-│   ├── STORAGE_INFRASTRUCTURE_PLAN.md  # קובץ זה
+│   ├── STORAGE_INFRASTRUCTURE_PLAN.md
 │   ├── SETUP.md
 │   └── API.md
-├── src/
-│   ├── storage/
-│   │   ├── storj_client.py    # לקוח Storj
-│   │   ├── database.py        # ניהול DB
-│   │   └── logger.py          # מערכת לוגים
+├── config/
 │   ├── agents/
-│   │   ├── base_agent.py      # מחלקת בסיס
-│   │   ├── grok.py
-│   │   ├── deepseek.py
-│   │   ├── gimai.py
-│   │   ├── chatgpt.py
-│   │   └── copilot.py
-│   └── config/
-│       └── settings.py        # הגדרות
+│   │   ├── grok.yaml
+│   │   ├── deepseek.yaml
+│   │   ├── gimai.yaml
+│   │   ├── chatgpt.yaml
+│   │   └── copilot.yaml
+│   ├── thresholds.yaml
+│   ├── orchestrator.yaml
+│   └── storage.yaml
+├── src/
+│   ├── agent/
+│   │   ├── bootstrap.py          # Agent startup
+│   │   ├── buffer.py             # SQLite buffer management
+│   │   ├── uploader.py           # Storj upload logic
+│   │   ├── heartbeat.py          # Real-time status
+│   │   └── edge_ai.py            # Local AI analysis
+│   ├── orchestrator/
+│   │   ├── api.py                # REST API
+│   │   ├── database.py           # Postgres connection
+│   │   └── reports.py            # PDF/Excel generation
+│   └── storage/
+│       ├── storj_client.py       # S3 compatible client
+│       └── gdrive_client.py      # Google Drive API
+├── scripts/
+│   ├── agent_bootstrap.sh
+│   ├── sync_config.sh
+│   └── generate_reports.sh
 ├── tests/
 │   └── test_storage.py
-└── .env.example               # דוגמה למשתני סביבה
+└── .env.example
 ```
 
 ---
 
 ## ⏭️ הצעדים הבאים / Next Steps
 
-1. **אשר את התוכנית** - האם זה מה שחשבת?
-2. **הגדר Storj** - צור Bucket ו-Access Grant
-3. **שתף פרטי גישה** - (באופן מאובטח!)
-4. **התחל יישום** - נתחיל לכתוב קוד?
+### מיידי (היום):
+1. ✅ אשר את התוכנית
+2. צור Bucket `owalai-production` ב-Storj
+3. צור Access Key ו-Secret Key
+
+### שבוע 1:
+4. הגדר Agent bootstrap script
+5. יישם SQLite buffer
+6. יישם Storj upload
+
+### שבוע 2:
+7. הגדר Orchestrator API
+8. חבר Postgres
+9. יישם Heartbeat
+
+### שבוע 3:
+10. חבר Google Drive
+11. יישם דוחות יומיים
+12. בדיקות E2E
 
 ---
 
-## 📞 שאלות לבירור / Questions to Clarify
+## 🤔 שאלות לבירור
 
-לפני שממשיכים, אשמח לדעת:
-
-1. **עדיפות** - מה חשוב יותר קודם: DB או לוגים?
-2. **שפת תכנות** - Python? Node.js? אחר?
-3. **רמת מורכבות** - התחלה מינימלית פשוטה או מערכת מלאה?
-4. **Google Drive** - רוצה להשתמש גם בו, או רק Storj?
-5. **תקציב** - יש מגבלות על שימוש ב-Storj?
+1. **שם הבאקט** - `owalai-production` או שם אחר?
+2. **Edge AI** - להשתמש ב-TinyLlama או מודל אחר?
+3. **תדירות דוחות** - יומי מספיק או צריך גם שבועי?
+4. **Orchestrator** - איפה הוא יושב? OVH?
 
 ---
 
-**הערה:** תוכנית זו היא נקודת התחלה. ניתן להרחיב או לצמצם לפי הצורך.
+**הערה:** תוכנית זו מבוססת על ארכיטקטורת "הסוכן הרזה" - מינימום מקומי, מקסימום בענן!
 
 ---
 
-*נוצר על ידי GitHub Copilot עבור פרויקט Nervesys*
+*נוצר על ידי GitHub Copilot עבור פרויקט Nervesys - גרסה 2.0*
