@@ -1,0 +1,60 @@
+# config/storage.yaml
+# External Storage Configuration for OWAL AI OS
+# This file is safe to commit to git (no secrets!)
+
+storj:
+  # Endpoint and region (not secret)
+  endpoint: "https://gateway.storjshare.io"
+  region: "eu1"
+  bucket: "owalai-production"
+  
+  # Credentials are in environment variables:
+  # STORJ_ACCESS_KEY
+  # STORJ_SECRET_KEY
+  
+  # Paths inside bucket
+  paths:
+    logs: "logs/{server}/{date}/"
+    metrics: "metrics/{server}/{date}/"
+    backups: "backups/{server}/{date}/"
+    state: "state/{server}/"
+  
+  # Upload settings
+  upload:
+    interval_minutes: 10
+    max_buffer_mb: 100
+    compress: true  # GZIP compression
+    compress_level: 6  # 1-9, higher = smaller file
+  
+  # Retention policy
+  # Logs kept longer for compliance/debugging
+  # Metrics/backups can be regenerated if needed
+  retention:
+    logs_days: 90       # Keep logs longer for debugging
+    metrics_days: 30    # Metrics can be aggregated
+    backups_days: 30    # Old backups replaced by new
+
+google_drive:
+  # Credentials are in environment variables:
+  # GDRIVE_SERVICE_ACCOUNT_JSON
+  # GDRIVE_FOLDER_ID
+  
+  # Folder structure inside main folder
+  folders:
+    archive: "Archive"
+    logs: "Logs"
+    reports: "Reports/Daily"
+    weekly_reports: "Reports/Weekly"
+    backups: "Backups"
+  
+  # Sync settings
+  sync:
+    reports_daily: true
+    reports_weekly: true
+    archive_after_days: 7  # Move to GDrive after 7 days in Storj
+  
+  # Report generation
+  reports:
+    format: "pdf"  # pdf or xlsx
+    include_graphs: true
+    include_summary: true

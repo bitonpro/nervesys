@@ -1,0 +1,66 @@
+# config/monitoring.yaml
+# Grafana Monitoring Configuration for OWAL AI OS
+# This file is safe to commit to git (no secrets!)
+
+grafana:
+  # URL is in environment variable:
+  # GRAFANA_URL
+  # GRAFANA_API_KEY
+  
+  # Dashboards to create/use
+  dashboards:
+    - name: "Agent Overview"
+      uid: "owalai-overview"
+      description: "All agents status at a glance"
+    - name: "Server Metrics"
+      uid: "owalai-metrics"
+      description: "CPU, RAM, Disk, Network per server"
+    - name: "Alerts History"
+      uid: "owalai-alerts"
+      description: "Alert history and trends"
+    - name: "Proxmox VMs"
+      uid: "owalai-proxmox"
+      description: "VM and Container status"
+  
+  # Alert thresholds
+  alerts:
+    cpu:
+      warning: 80
+      critical: 90
+    memory:
+      warning: 75
+      critical: 85
+    disk:
+      warning: 70
+      critical: 80
+    network:
+      warning_mbps: 800
+      critical_mbps: 950
+    
+    # Agent health
+    heartbeat_timeout_seconds: 300
+    buffer_full_threshold_mb: 90
+  
+  # Notification channels
+  notifications:
+    - type: "slack"
+      enabled: false
+      # SLACK_WEBHOOK_URL in env
+    - type: "email"
+      enabled: false
+      # EMAIL_SMTP_* in env
+    - type: "telegram"
+      enabled: false
+      # TELEGRAM_BOT_TOKEN in env
+
+# Heartbeat settings
+heartbeat:
+  interval_seconds: 60
+  include_metrics: true
+  metrics:
+    - cpu_percent
+    - memory_percent
+    - disk_percent
+    - network_io
+    - buffer_size_mb
+    - uptime_seconds

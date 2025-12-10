@@ -1,0 +1,65 @@
+# config/proxmox.yaml
+# Proxmox VE Integration Configuration for OWAL AI OS
+# This file is safe to commit to git (no secrets!)
+
+proxmox:
+  enabled: true
+  
+  # Credentials are in environment variables:
+  # PROXMOX_URL
+  # PROXMOX_TOKEN
+  
+  # SSL verification (disable if self-signed cert)
+  verify_ssl: false
+  
+  # Monitoring settings
+  monitoring:
+    enabled: true
+    interval_seconds: 60
+    
+    # What to monitor
+    collect:
+      - nodes         # Cluster nodes status
+      - qemu          # Virtual machines
+      - lxc           # LXC containers
+      - storage       # Storage status
+      - network       # Network status
+    
+    # Metrics to collect per VM/Container
+    vm_metrics:
+      - cpu
+      - memory
+      - disk
+      - network
+      - uptime
+  
+  # Automated actions
+  actions:
+    # Auto-migrate VM if node overloaded
+    auto_migrate:
+      enabled: false
+      cpu_threshold: 90
+      memory_threshold: 90
+    
+    # Auto-backup
+    auto_backup:
+      enabled: true
+      schedule: "0 3 * * *"  # Daily at 3:00 AM (server local time)
+      timezone: "UTC"        # Timezone for schedule
+      storage: "local"       # Proxmox storage for temp backup
+      upload_to_storj: true  # Upload to Storj after
+      delete_local: true     # Delete local backup after upload
+      compress: true
+      mode: "snapshot"       # snapshot or stop
+    
+    # Auto-start VMs on boot
+    auto_start:
+      enabled: true
+      delay_seconds: 30
+  
+  # Alerts
+  alerts:
+    node_offline: true
+    vm_stopped: true
+    storage_full: true
+    backup_failed: true

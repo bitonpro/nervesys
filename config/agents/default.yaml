@@ -1,0 +1,50 @@
+# config/agents/default.yaml
+# Default Agent Configuration for OWAL AI OS
+# Each agent reads this + its specific {hostname}.yaml
+
+agent:
+  # Agent identification (will be overridden per server)
+  id: "default"
+  role: "monitor"
+  description: "Default OWAL AI Agent"
+  
+  # Bootstrap settings
+  bootstrap:
+    config_repo: "https://github.com/bitonpro/nervesys"
+    config_branch: "main"
+    refresh_interval_minutes: 60
+  
+  # Local buffer settings
+  buffer:
+    type: "sqlite"
+    path: "/tmp/owalai/buffer.db"
+    max_size_mb: 100
+    flush_interval_minutes: 10
+    flush_on_size_mb: 10
+  
+  # Logging settings
+  logging:
+    level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+    format: "json"
+    include_hostname: true
+    include_timestamp: true
+  
+  # Features to enable
+  features:
+    monitoring: true
+    alerting: true
+    backup: true
+    ai_analysis: true
+    proxmox_integration: true
+  
+  # Health check
+  health:
+    self_check_interval_seconds: 30
+    restart_on_failure: true
+    max_restart_attempts: 3
+  
+  # Resource limits (for the agent itself)
+  resources:
+    max_cpu_percent: 5
+    max_memory_mb: 256
+    max_disk_mb: 500

@@ -1,0 +1,64 @@
+# config/alibaba.yaml
+# Alibaba Cloud AI Configuration for OWAL AI OS
+# This file is safe to commit to git (no secrets!)
+
+alibaba:
+  enabled: true
+  
+  # Credentials are in environment variables:
+  # ALIBABA_ACCESS_KEY
+  # ALIBABA_SECRET_KEY
+  
+  region: "cn-shanghai"  # or other region
+  
+  # AI Model settings
+  model:
+    name: "qwen-max"  # or qwen-plus, qwen-turbo
+    # Check your actual limit at Alibaba Cloud Console
+    max_tokens: 100000  # Adjust based on your subscription
+    temperature: 0.7
+  
+  # What to use AI for
+  use_cases:
+    # Edge AI - analyze logs before upload
+    edge_analysis:
+      enabled: true
+      analyze_errors: true
+      analyze_warnings: true
+      skip_info: true  # Don't analyze INFO logs
+    
+    # Anomaly detection
+    anomaly_detection:
+      enabled: true
+      metrics:
+        - cpu_usage
+        - memory_usage
+        - disk_io
+        - network_traffic
+      sensitivity: "medium"  # low, medium, high
+    
+    # Report generation
+    report_generation:
+      enabled: true
+      daily_summary: true
+      weekly_insights: true
+      include_recommendations: true
+    
+    # Predictive analysis
+    prediction:
+      enabled: true
+      predict_disk_full: true
+      predict_resource_needs: true
+      look_ahead_days: 7
+  
+  # Rate limiting
+  rate_limit:
+    requests_per_minute: 60
+    tokens_per_day: 100000  # Conservative limit
+  
+  # Triggers for immediate AI analysis
+  triggers:
+    - on_critical_error: "analyze_and_alert"
+    - on_anomaly: "investigate"
+    - daily_at: "23:00"  # Daily summary
+    - weekly_at: "Sunday 23:00"  # Weekly insights
