@@ -3,166 +3,89 @@
 
 **תאריך / Date:** 2025-12-10  
 **סטטוס / Status:** תכנון / Planning  
-**גרסה / Version:** 2.0 - ארכיטקטורת "הסוכן הרזה"  
-**מטרה / Goal:** הגדרת מאגר נתונים (DB) ומערכת לוגים חיצונית לכל סוכני ה-AI
+**גרסה / Version:** 3.0 - ארכיטקטורת ארבעת העמודים  
+**מטרה / Goal:** הגדרת 4 עמודי תשתית עליהם נשען כל סוכן AI
 
 ---
 
-## 🎯 עקרון מנחה: "הסוכן הרזה" (The Lean Agent)
+## 🏛️ ארבעת העמודים / The Four Pillars
 
-**המטרה:** הסוכן שוקל כמעט כלום. אין לו DB כבד מקומי. הוא רק "צינור" שמעביר מידע החוצה.
+הסוכן הרזה נשען על **4 עמודים חיצוניים** - אין לו כלום מקומית!
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                        LEAN AGENT ARCHITECTURE                          │
-├─────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│   ┌─────────────┐    git pull     ┌─────────────────────────────────┐  │
-│   │   GitHub    │◄───────────────►│  Agent (AIGARDEN01 / Server)    │  │
-│   │  nervesys   │   Config/Brain  │  ┌─────────────────────────┐    │  │
-│   └─────────────┘                 │  │  SQLite Buffer (≤100MB) │    │  │
-│                                   │  └───────────┬─────────────┘    │  │
-│   ┌─────────────┐                 │              │                  │  │
-│   │   Storj     │◄────────────────│──────────────┤ Upload & Delete  │  │
-│   │  (Archive)  │   GZIP Logs     │              │ Every 10 min     │  │
-│   └─────────────┘                 │              │                  │  │
-│                                   │              ▼                  │  │
-│   ┌─────────────┐                 │  ┌─────────────────────────┐    │  │
-│   │ Orchestrator│◄────────────────│──│    Heartbeat/Status     │    │  │
-│   │  Postgres   │   Real-time     │  │  (CPU, RAM, Alerts)     │    │  │
-│   └─────────────┘                 │  └─────────────────────────┘    │  │
-│                                   └─────────────────────────────────┘  │
-│   ┌─────────────┐                                                      │
-│   │Google Drive │◄──────────────── Daily PDF/Excel Reports             │
-│   │  (Reports)  │                                                      │
-│   └─────────────┘                                                      │
-│                                                                         │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## 🧠 שכבה 1: המוח וההגדרות (GitHub - Nervesys)
-
-**השיטה:** GitOps - הסוכן לא מחזיק לוגיקה קשיחה. הוא מושך אותה.
-
-### הפעולה:
-כשסוכן (Agent) עולה ב-AIGARDEN01 או בכל מקום אחר:
-```bash
-git pull https://github.com/bitonpro/nervesys
-```
-
-### מה הסוכן מקבל:
-- **Config** - מי אני? מה התפקיד שלי?
-- **Thresholds** - מה הספים להתראה?
-- **Rules** - כללי התנהגות ולוגיקה
-
-### היתרון:
-✅ שינוי אחד בגיטהאב מעדכן את **כל** החווה!
-
-### מבנה Config מוצע ב-nervesys:
-```
-nervesys/
-├── config/
-│   ├── agents/
-│   │   ├── grok.yaml
-│   │   ├── deepseek.yaml
-│   │   ├── gimai.yaml
-│   │   ├── chatgpt.yaml
-│   │   └── copilot.yaml
-│   ├── thresholds.yaml       # ספים להתראות
-│   ├── orchestrator.yaml     # הגדרות Orchestrator
-│   └── storage.yaml          # הגדרות Storj/Google Drive
-└── scripts/
-    ├── agent_bootstrap.sh    # סקריפט אתחול סוכן
-    └── sync_config.sh        # סנכרון הגדרות
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                     THE FOUR PILLARS ARCHITECTURE                                │
+│                     ארכיטקטורת ארבעת העמודים                                     │
+├──────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│    ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐              │
+│    │   PILLAR 1      │   │   PILLAR 2      │   │   PILLAR 3      │              │
+│    │   🗄️ Storj DB   │   │   📁 Google     │   │   🧠 GitHub     │              │
+│    │   (External DB) │   │   Drive         │   │   nervesys      │              │
+│    │                 │   │   (Archive)     │   │   (Brain)       │              │
+│    │   eu1.storj.io  │   │                 │   │                 │              │
+│    └────────┬────────┘   └────────┬────────┘   └────────┬────────┘              │
+│             │                     │                     │                        │
+│             │                     │                     │                        │
+│             └──────────────┬──────┴──────────┬──────────┘                        │
+│                            │                 │                                   │
+│                            ▼                 ▼                                   │
+│                   ┌─────────────────────────────────────┐                        │
+│                   │           PILLAR 4                  │                        │
+│                   │         📊 GRAFANA                  │                        │
+│                   │     (Monitoring & Actions)          │                        │
+│                   │                                     │                        │
+│                   │   Reads from: DB + Archive + Brain  │                        │
+│                   │   Creates: Dashboards + Alerts      │                        │
+│                   └─────────────────────────────────────┘                        │
+│                                                                                  │
+│                            ▲                                                     │
+│                            │                                                     │
+│                   ┌────────┴────────┐                                            │
+│                   │  🤖 LEAN AGENT  │                                            │
+│                   │  (Almost Zero   │                                            │
+│                   │   Local State)  │                                            │
+│                   └─────────────────┘                                            │
+│                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 💾 שכבה 2: זיכרון לטווח קצר (SQLite / RAM Buffer)
+## 🗄️ עמוד 1: External DB - Storj (eu1.storj.io)
 
-**המטרה:** סוכן AI צריך לזכור מה קרה לפני דקה. אבל **אסור** לו לתפוס מקום.
+**קישור:** https://eu1.storj.io (Project Dashboard)
 
-### הפתרון:
-שימוש ב-**SQLite** (קובץ בודד) או **In-Memory DB**
+**תפקיד:** בסיס הנתונים החיצוני הראשי - אחסון מהיר לכל הנתונים הפעילים.
 
-### הפעולה:
-```
-הסוכן רושם לוגים ונתונים לקובץ זמני מקומי:
-/tmp/agent/buffer.db
-```
+### מה נשמר כאן:
+| סוג מידע | תיאור | תדירות עדכון |
+|----------|-------|---------------|
+| **Agent State** | מצב נוכחי של כל סוכן | Real-time |
+| **Metrics** | CPU, RAM, Disk של כל שרת | כל דקה |
+| **Logs (Active)** | לוגים אקטיביים (7 ימים אחרונים) | כל 10 דקות |
+| **Configs Backup** | גיבוי הגדרות | יומי |
 
-### 🚨 החוק הקדוש:
-```
-הקובץ הזה לעולם לא עובר גודל של 100MB!
-אם הוא מתמלא → הוא נשלח החוצה ונמחק.
-```
-
-### מבנה טבלת Buffer:
-```sql
-CREATE TABLE logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    level TEXT,           -- INFO, WARN, ERROR, CRITICAL
-    agent_id TEXT,
-    action TEXT,
-    message TEXT,
-    context TEXT,         -- JSON stored as TEXT (SQLite 3.9+ has JSON1 extension)
-    uploaded INTEGER DEFAULT 0
-);
-
--- Index for quick queries
-CREATE INDEX idx_uploaded ON logs(uploaded);
-CREATE INDEX idx_timestamp ON logs(timestamp);
-CREATE INDEX idx_agent_time ON logs(agent_id, timestamp);
-```
-
-**הערה:** SQLite 3.9+ תומך ב-JSON1 extension. אם משתמשים בגרסה ישנה יותר, הנתונים נשמרים כ-TEXT.
-
----
-
-## 📦 שכבה 3: זיכרון לטווח ארוך (Storj - Archive)
-
-**המטרה:** זה ה"מחסן" - כל ההיסטוריה נשמרת כאן.
-
-### הבאקט (Bucket):
-```
-שם: owalai-production
-אזור: EU1 (כפי שמופיע בקישור שלך)
-```
-
-### מבנה הארכיון:
+### מבנה הבאקט:
 ```
 owalai-production/
-├── logs/
-│   ├── AIGARDEN01/
-│   │   ├── 2025-12-10/
-│   │   │   ├── 00-00.json.gz
-│   │   │   ├── 00-10.json.gz
-│   │   │   └── ...
-│   │   └── 2025-12-11/
-│   └── AIGARDEN02/
-├── backups/
+├── db/
+│   ├── agents/                    # מצב סוכנים
+│   │   ├── grok_state.json
+│   │   ├── deepseek_state.json
+│   │   └── ...
+│   ├── metrics/                   # מדדים
+│   │   └── {server}/{date}/
+│   └── active_logs/               # לוגים פעילים (7 ימים)
+│       └── {server}/{date}/
+├── config_backups/
 │   └── daily/
-└── configs/
-    └── snapshots/
+└── shared/
+    └── knowledge_base.json
 ```
-
-### הפעולה (כל 10 דקות או 10MB):
-```
-1. הסוכן צובר לוגים ב-SQLite
-2. הסוכן דוחס אותם (GZIP) - הקטנה של ~90%!
-3. הסוכן שולח (Upload) ל-Storj דרך פרוטוקול S3
-4. הסוכן מוחק את הקובץ המקומי
-```
-
-### ✅ התוצאה:
-**הדיסק של השרת המקומי נשאר ריק תמיד!**
 
 ### Environment Variables:
 ```bash
-# Storj Configuration
 STORJ_ACCESS_KEY=<your-access-key>
 STORJ_SECRET_KEY=<your-secret-key>
 STORJ_BUCKET=owalai-production
@@ -172,185 +95,80 @@ STORJ_REGION=eu1
 
 ---
 
-## ⚡ שכבה 4: מצב בזמן אמת (Postgres ב-Orchestrator)
+## 📁 עמוד 2: Archive Storage - Google Drive
 
-**המטרה:** Storj זה לארכיון (היסטוריה). ה-AI המרכזי צריך לדעת מה קורה **עכשיו**.
+**תפקיד:** ארכיון לדברים איטיים - היסטוריה ארוכת טווח, דוחות, גיבויים.
 
-### הפעולה:
-הסוכן שולח **"דופק" (Heartbeat)** וסטטוס קריטי:
-```json
-{
-  "agent_id": "GROK",
-  "server": "AIGARDEN01",
-  "timestamp": "2025-12-10T19:45:00Z",
-  "status": "healthy",
-  "metrics": {
-    "cpu_percent": 45.2,
-    "ram_percent": 62.1,
-    "disk_percent": 23.4,
-    "buffer_size_mb": 12.5
-  },
-  "alerts": [],
-  "last_action": "code_review",
-  "uptime_seconds": 86400
-}
-```
-
-### זה נשמר ב-Postgres המרכזי (OVH):
-```sql
-CREATE TABLE agent_status (
-    id SERIAL PRIMARY KEY,
-    agent_id VARCHAR(50),
-    server VARCHAR(100),
-    timestamp TIMESTAMPTZ DEFAULT NOW(),
-    status VARCHAR(20),
-    metrics JSONB,
-    alerts JSONB,
-    last_action VARCHAR(100),
-    uptime_seconds INTEGER
-);
-
--- Index for real-time queries
-CREATE INDEX idx_agent_status_time ON agent_status(agent_id, timestamp DESC);
-```
-
----
-
-## 📊 שכבה 5: דוחות מנהלים (Google Drive)
-
-**הכלל:** אל תשתמש ב-Drive ללוגים. תשתמש בו לדוחות אנושיים!
-
-### הפעולה:
-ה-**Orchestrator** מייצר בסוף יום:
-- דוח PDF מסכם
-- Excel עם נתונים
-- גרפים ותרשימים
+### מה נשמר כאן:
+| סוג מידע | תיאור | שמירה |
+|----------|-------|-------|
+| **Old Logs** | לוגים ישנים (מעל 7 ימים) | שנה |
+| **Reports** | דוחות PDF/Excel יומיים/שבועיים | לצמיתות |
+| **Backups** | גיבויים מלאים | 30 יום |
+| **Documents** | תיעוד ומדריכים | לצמיתות |
 
 ### מבנה ב-Google Drive:
 ```
-OWAL AI Reports/
-├── Daily/
-│   ├── 2025-12-10_summary.pdf
-│   ├── 2025-12-10_metrics.xlsx
-│   └── ...
-├── Weekly/
-│   └── Week_50_2025.pdf
-└── Alerts/
-    └── Critical_2025-12-10.pdf
+OWAL AI/
+├── Archive/
+│   └── logs/
+│       └── {year}/{month}/
+│           └── {server}_{date}.json.gz
+├── Reports/
+│   ├── Daily/
+│   │   └── {date}_summary.pdf
+│   ├── Weekly/
+│   │   └── week_{number}.pdf
+│   └── Monthly/
+├── Backups/
+│   └── full_backup_{date}.tar.gz
+└── Documentation/
+    ├── API.md
+    └── Setup_Guide.pdf
 ```
 
-### היתרון:
-✅ קריאה אנושית נוחה
-✅ שיתוף קל עם הצוות
-✅ לא עומס על המערכת
-
----
-
-## 🛠️ Best Practices - עצות לשיפור
-
-### 1️⃣ דחיסה לפני שליחה (Compression)
+### החוק:
 ```
-❌ לעולם אל תשלח טקסט (Log) גולמי ל-Storj!
-✅ הסוכן צריך לדחוס ל-GZIP לפני השליחה
-📉 זה מקטין את הנפח ב-90%!
-```
-
-### 2️⃣ Zero-Config Agent
-```
-הסוכן לא צריך לדעת כלום כשהוא מותקן חוץ מ-Token אחד!
-
-עם הטוקן הזה הוא:
-1. הולך ל-Orchestrator
-2. מקבל את ה-Storj Credentials
-3. מקבל את ה-Git Config
-4. מתחיל לעבוד!
-```
-
-### 3️⃣ Buffer למקרה של נתק
-```
-אם האינטרנט נופל, הסוכן לא קורס!
-
-הסוכן:
-1. ממשיך לכתוב ל-SQLite המקומי
-2. ברגע שהרשת חוזרת
-3. "מקיא" את כל המידע ל-Storj
-4. מתרוקן
-```
-
-### 4️⃣ Edge AI - לוגיקה חכמה
-```
-לפני שהסוכן שולח לוג שגיאה ל-Storj:
-
-ה-AI הקטן המקומי מנתח אותו:
-- אם זה קריטי → התראה מיידית ל-API
-- אם זה סתם "Info" → זה הולך לארכיון ב-Storj
-
-אפשרויות מודל Edge:
-- TinyLlama 1.1B (מומלץ - קל וחזק)
-- Phi-2 (Microsoft)
-- או כל מודל GGUF קטן
+✅ Google Drive = דברים איטיים + קריאה אנושית
+❌ לא ללוגים פעילים!
+❌ לא לנתונים שצריך לגשת אליהם מהר!
 ```
 
 ---
 
-## 📋 סיכום הפעולה המיידית
+## 🧠 עמוד 3: The Brain - GitHub nervesys
 
-### שלב 1: Storj
-```bash
-# צור Bucket בשם owalai-production
-# צור Access Key ו-Secret Key
-# שמור אותם במקום בטוח!
+**קישור:** https://github.com/bitonpro/nervesys
+
+**תפקיד:** המוח של כל הסוכנים - כשסוכן עולה לחיים, הוא **ניגש ישר לשם**!
+
+### היתרון הגדול:
+```
+🚀 ההתקנה קצרה!
+הסוכן לא צריך לדעת כלום - רק את כתובת ה-GitHub.
+הוא מושך הכל משם ומתחיל לעבוד.
 ```
 
-### שלב 2: Orchestrator
-```bash
-# הכנס את המפתחות ל-Vault
-# (ב-docker-compose של השרת הראשי)
-```
+### מה הסוכן קורא מכאן:
+| קובץ | תפקיד |
+|------|-------|
+| `config/agents/{name}.yaml` | מי אני? מה התפקיד שלי? |
+| `config/thresholds.yaml` | מה הספים להתראה? |
+| `config/storage.yaml` | איפה הDB? איפה הארכיון? |
+| `config/grafana.yaml` | הגדרות Grafana |
+| `scripts/bootstrap.sh` | סקריפט התחלה |
 
-### שלב 3: Agent
-```bash
-# עדכן את הסקריפט:
-# - לא לשמור לוגים מקומית לנצח
-# - Upload & Delete ל-Storj כל 10 דקות
-```
+### מה הסוכן כותב לכאן:
+| קובץ | תפקיד |
+|------|-------|
+| `state/{agent}_last_status.json` | סטטוס אחרון |
+| `logs/errors/{agent}_errors.log` | שגיאות קריטיות |
+| `metrics/daily/{date}.json` | סיכום יומי |
 
----
-
-## 🔄 הפתרון המשולש - סיכום
-
-| שכבה | מטרה | טכנולוגיה | תדירות |
-|------|------|-----------|---------|
-| **1. Real-time** | מה קורה עכשיו | Postgres (Orchestrator) | כל דקה (Heartbeat) |
-| **2. Archive** | היסטוריה ולוגים | Storj (S3) | כל 10 דק / 10MB |
-| **3. Reports** | קריאה אנושית | Google Drive | יומי |
-
-### תרשים זרימה:
-```
-Agent Local          →  Orchestrator API  →  Postgres (Real-time)
-     ↓
-SQLite Buffer (≤100MB)
-     ↓
-GZIP Compress
-     ↓
-Storj Upload (Archive)
-     ↓
-Local Delete
-     ↓
-Orchestrator generates  →  Google Drive (Daily Reports)
-```
-
----
-
-## 📁 מבנה קבצים מוצע לפרויקט
-
+### מבנה nervesys המעודכן:
 ```
 nervesys/
 ├── CONTRIBUTORS.json              # AI Collaborators
-├── docs/
-│   ├── STORAGE_INFRASTRUCTURE_PLAN.md
-│   ├── SETUP.md
-│   └── API.md
 ├── config/
 │   ├── agents/
 │   │   ├── grok.yaml
@@ -358,69 +176,237 @@ nervesys/
 │   │   ├── gimai.yaml
 │   │   ├── chatgpt.yaml
 │   │   └── copilot.yaml
-│   ├── thresholds.yaml
-│   ├── orchestrator.yaml
-│   └── storage.yaml
-├── src/
-│   ├── agent/
-│   │   ├── bootstrap.py          # Agent startup
-│   │   ├── buffer.py             # SQLite buffer management
-│   │   ├── uploader.py           # Storj upload logic
-│   │   ├── heartbeat.py          # Real-time status
-│   │   └── edge_ai.py            # Local AI analysis
-│   ├── orchestrator/
-│   │   ├── api.py                # REST API
-│   │   ├── database.py           # Postgres connection
-│   │   └── reports.py            # PDF/Excel generation
-│   └── storage/
-│       ├── storj_client.py       # S3 compatible client
-│       └── gdrive_client.py      # Google Drive API
+│   ├── thresholds.yaml            # ספים להתראות
+│   ├── storage.yaml               # Storj + Google Drive settings
+│   ├── grafana.yaml               # Grafana dashboards config
+│   └── alibaba.yaml               # Alibaba Cloud AI config (optional)
+├── state/                         # Agent states (auto-updated)
+│   ├── grok_last_status.json
+│   └── ...
 ├── scripts/
-│   ├── agent_bootstrap.sh
-│   ├── sync_config.sh
-│   └── generate_reports.sh
-├── tests/
-│   └── test_storage.py
-└── .env.example
+│   ├── bootstrap.sh               # Agent startup
+│   └── sync.sh                    # Sync with cloud
+├── dashboards/                    # Grafana dashboard JSONs
+│   ├── main_overview.json
+│   ├── agent_details.json
+│   └── alerts.json
+└── docs/
+    ├── STORAGE_INFRASTRUCTURE_PLAN.md
+    └── SETUP.md
+```
+
+### GitOps Flow:
+```
+1. Agent starts
+2. git clone/pull https://github.com/bitonpro/nervesys
+3. Read config/agents/{my_name}.yaml
+4. Connect to Storj (from config/storage.yaml)
+5. Start working!
+6. Periodically git push state updates
 ```
 
 ---
 
-## ⏭️ הצעדים הבאים / Next Steps
+## 📊 עמוד 4: Monitoring & Actions - Grafana
 
-### מיידי (היום):
-1. ✅ אשר את התוכנית
+**תפקיד:** הצגה ויזואלית + התראות + פעולות אוטומטיות
+
+### Grafana קורא מ:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    GRAFANA DATA SOURCES                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    │
+│   │   Storj     │    │   Google    │    │   GitHub    │    │
+│   │   (DB)      │    │   Drive     │    │  nervesys   │    │
+│   │             │    │  (Archive)  │    │   (Brain)   │    │
+│   └──────┬──────┘    └──────┬──────┘    └──────┬──────┘    │
+│          │                  │                  │            │
+│          └──────────────────┼──────────────────┘            │
+│                             ▼                               │
+│                    ┌─────────────────┐                      │
+│                    │    GRAFANA      │                      │
+│                    │   Dashboards    │                      │
+│                    └─────────────────┘                      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### מה Grafana מציג:
+| Dashboard | מקור נתונים | תיאור |
+|-----------|-------------|-------|
+| **Main Overview** | Storj | סטטוס כל הסוכנים בזמן אמת |
+| **Agent Details** | Storj + nervesys | פירוט לכל סוכן |
+| **Historical Trends** | Google Drive | מגמות לאורך זמן |
+| **Alerts** | All sources | התראות פעילות |
+| **Config Changes** | nervesys | שינויי הגדרות |
+
+### Alerts & Actions:
+```yaml
+# Example Grafana Alert Rule
+alerts:
+  - name: "Agent Down"
+    condition: "no heartbeat > 5 minutes"
+    actions:
+      - notify: "slack"
+      - notify: "email"
+      - auto_action: "restart_agent"
+      
+  - name: "High CPU"
+    condition: "cpu > 90% for 10 minutes"
+    actions:
+      - notify: "slack"
+      - log_to: "nervesys/logs/alerts/"
+```
+
+### Grafana Setup:
+```yaml
+# config/grafana.yaml
+grafana:
+  url: "https://grafana.yourdomain.com"
+  api_key: "${GRAFANA_API_KEY}"
+  
+  datasources:
+    - name: "Storj-DB"
+      type: "s3"
+      endpoint: "${STORJ_ENDPOINT}"
+      bucket: "owalai-production"
+      
+    - name: "nervesys-GitHub"
+      type: "github"
+      repo: "bitonpro/nervesys"
+      
+    - name: "Archive-GDrive"
+      type: "google-drive"
+      folder_id: "${GDRIVE_FOLDER_ID}"
+```
+
+---
+
+## 🤖 Alibaba Cloud - היכן זה משתלב?
+
+**שאלה:** האם Alibaba Cloud עם מיליון הטוקנים מתאים כאן?
+
+### ✅ כן! אפשר להשתמש ב-Alibaba Cloud עבור:
+
+| שימוש | תיאור | יתרון |
+|-------|-------|-------|
+| **Edge AI** | ניתוח לוגים לפני שליחה | חוסך bandwidth |
+| **Log Analysis** | ניתוח לוגים ב-Archive | זיהוי patterns |
+| **Report Generation** | יצירת דוחות חכמים | סיכומים אוטומטיים |
+| **Anomaly Detection** | זיהוי חריגות | התראות מוקדמות |
+
+### הגדרה ב-nervesys:
+```yaml
+# config/alibaba.yaml
+alibaba_cloud:
+  enabled: true
+  api_key: "${ALIBABA_API_KEY}"
+  model: "qwen-max"  # or other Alibaba models
+  max_tokens: 1000000
+  
+  use_for:
+    - edge_analysis: true      # ניתוח לוגים מקומי
+    - log_summarization: true  # סיכום לוגים
+    - anomaly_detection: true  # זיהוי חריגות
+    - report_generation: true  # יצירת דוחות
+    
+  triggers:
+    - on_error_log: "analyze_and_alert"
+    - daily_summary: "generate_report"
+```
+
+### Flow עם Alibaba:
+```
+Agent detects error
+    ↓
+Send to Alibaba AI for analysis
+    ↓
+AI determines: Critical? / Normal?
+    ↓
+Critical → Immediate alert to Grafana
+Normal → Archive to Google Drive
+```
+
+---
+
+## 📋 סיכום ארבעת העמודים
+
+| # | עמוד | שירות | תפקיד | תדירות גישה |
+|---|------|-------|-------|-------------|
+| **1** | 🗄️ DB | Storj | נתונים פעילים + Real-time | כל דקה |
+| **2** | 📁 Archive | Google Drive | היסטוריה + דוחות | יומי |
+| **3** | 🧠 Brain | GitHub nervesys | Config + State + Code | On startup + periodic |
+| **4** | 📊 Monitor | Grafana | Dashboards + Alerts + Actions | Continuous |
+
+### + Bonus:
+| **+** | 🤖 AI | Alibaba Cloud | Edge Analysis + Reports | On-demand |
+
+---
+
+## 🔄 Flow מלא של הסוכן
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     COMPLETE AGENT FLOW                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. STARTUP                                                     │
+│     └── git pull nervesys → Read config → Connect to Storj     │
+│                                                                 │
+│  2. RUNNING                                                     │
+│     └── Do work → Log to SQLite buffer (≤100MB)                │
+│                                                                 │
+│  3. EVERY MINUTE                                                │
+│     └── Send heartbeat to Storj (Grafana reads this)           │
+│                                                                 │
+│  4. EVERY 10 MINUTES (or 10MB buffer)                          │
+│     └── GZIP logs → Upload to Storj → Delete local             │
+│                                                                 │
+│  5. ON ERROR                                                    │
+│     └── Alibaba AI analyzes → Alert if critical                │
+│                                                                 │
+│  6. DAILY                                                       │
+│     └── Old logs → Archive to Google Drive                     │
+│     └── Generate reports → Save to Google Drive                │
+│                                                                 │
+│  7. PERIODIC                                                    │
+│     └── git push state updates to nervesys                     │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## ⏭️ הצעדים הבאים
+
+### מיידי:
+1. ✅ אשר את מבנה 4 העמודים
 2. צור Bucket `owalai-production` ב-Storj
-3. צור Access Key ו-Secret Key
+3. הגדר תיקייה ב-Google Drive
+4. התקן Grafana (או השתמש ב-Grafana Cloud)
 
 ### שבוע 1:
-4. הגדר Agent bootstrap script
-5. יישם SQLite buffer
-6. יישם Storj upload
+5. צור מבנה ב-nervesys (config, state, dashboards)
+6. כתוב bootstrap.sh
+7. חבר Alibaba Cloud API (אופציונלי)
 
 ### שבוע 2:
-7. הגדר Orchestrator API
-8. חבר Postgres
-9. יישם Heartbeat
-
-### שבוע 3:
-10. חבר Google Drive
-11. יישם דוחות יומיים
-12. בדיקות E2E
+8. הגדר Grafana dashboards
+9. הגדר alerts
+10. בדיקות E2E
 
 ---
 
-## 🤔 שאלות לבירור
+**סיכום:** הסוכן נשען על 4 עמודים חיצוניים:
+1. **Storj** = DB פעיל
+2. **Google Drive** = ארכיון איטי
+3. **GitHub nervesys** = המוח (config + state)
+4. **Grafana** = עיניים + פעולות
 
-1. **שם הבאקט** - `owalai-production` או שם אחר?
-2. **Edge AI** - להשתמש ב-TinyLlama או מודל אחר?
-3. **תדירות דוחות** - יומי מספיק או צריך גם שבועי?
-4. **Orchestrator** - איפה הוא יושב? OVH?
-
----
-
-**הערה:** תוכנית זו מבוססת על ארכיטקטורת "הסוכן הרזה" - מינימום מקומי, מקסימום בענן!
+**+ Alibaba Cloud** (אופציונלי) = AI לניתוח ודוחות
 
 ---
 
-*נוצר על ידי GitHub Copilot עבור פרויקט Nervesys - גרסה 2.0*
+*נוצר על ידי GitHub Copilot עבור פרויקט Nervesys - גרסה 3.0*
