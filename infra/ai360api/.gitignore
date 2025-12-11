@@ -31,3 +31,9 @@ iptables-backup-*.rules
 local_config.*
 .env
 .env.local
+
+# Ignore Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
