@@ -11,8 +11,8 @@ from pathlib import Path
 
 RANGES_FILE = "ranges.csv"
 OUT_FILE = "mappings.csv"
-VM_PREFIX = "vm"  # will produce vm-1.ai360api.com ...
-ZONE = "vm.ai360api.com"  # base domain; we'll use vm-N.vm.ai360api.com pattern
+VM_PREFIX = "vm"  # will produce vm-1, vm-2, etc.
+ZONE = "vm.ai360api.com"  # base domain; final pattern will be vm-1.vm.ai360api.com, vm-2.vm.ai360api.com, etc.
 
 # Placeholder internal IPs: you MUST replace these with real internal IPs for your containers/VMs
 # Example: internal_ips = ["10.0.10.11", "10.0.10.12", ...]

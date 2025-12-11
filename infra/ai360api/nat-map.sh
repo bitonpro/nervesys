@@ -7,14 +7,16 @@
 #
 OUTER_IF="vmbr0"   # adjust to your external interface on AIGARDEN02
 PUB_IP="51.91.105.16"
-MAPPINGS="${1:-mappings.csv}"
+MAPPINGS="mappings.csv"
 MODE="dry"
-shift 1 || true
+
+# Parse arguments
 for arg in "$@"; do
   case $arg in
     --apply) MODE="apply";;
     --dry-run) MODE="dry";;
     --flush) MODE="flush";;
+    *.csv) MAPPINGS="$arg";;
   esac
 done
 
@@ -35,13 +37,13 @@ if [ "$MODE" = "flush" ]; then
   echo "Flushing rules added by this script (searching by comment OWALAI-AI360)..."
   # flush NAT PREROUTING rules with comment
   iptables -t nat -S PREROUTING | grep OWALAI-AI360 | while read -r line; do
-    rule=$(echo "$line" | sed 's/^-A/A/')
+    rule=$(echo "$line" | sed 's/^-A/-D/')
     echo "Deleting: $rule"
     iptables -t nat $rule
   done
   # flush forward rules with comment
   iptables -S FORWARD | grep OWALAI-AI360 | while read -r line; do
-    rule=$(echo "$line" | sed 's/^-A/A/')
+    rule=$(echo "$line" | sed 's/^-A/-D/')
     echo "Deleting: $rule"
     iptables $rule
   done
