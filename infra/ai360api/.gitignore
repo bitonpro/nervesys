@@ -1,0 +1,33 @@
+# Ignore credentials and sensitive files
+*.json
+credentials/*
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+*secret*
+*password*
+*token*
+
+# Ignore generated CSV files (regenerate as needed)
+ranges.csv
+mappings.csv
+
+# Ignore iptables backup files
+iptables-backup-*.rules
+
+# Ignore logs
+*.log
+
+# Ignore temporary files
+*.tmp
+*.temp
+*~
+.*.swp
+.*.swo
+
+# Ignore local configuration overrides
+local_config.*
+.env
+.env.local
