@@ -68,8 +68,12 @@ def create_regression_timeline():
 def create_price_pie():
     """Generate price comparison pie chart (Israel vs USA)."""
     # Focus on Israel vs USA comparison
+    df = pd.read_csv('price_comparison.csv')
+    israel_price = df[df['Country'] == 'Israel']['Monthly Price (USD)'].values[0]
+    usa_price = df[df['Country'] == 'USA']['Monthly Price (USD)'].values[0]
+    
     countries = ['Israel', 'USA']
-    prices = [270, 22]
+    prices = [israel_price, usa_price]
     
     fig, ax = plt.subplots(figsize=(8, 8))
     
@@ -84,7 +88,7 @@ def create_price_pie():
         autotext.set_fontweight('bold')
         autotext.set_fontsize(14)
     
-    ax.set_title('Gemini Pricing Distribution: Israel ($270) vs USA ($22)', 
+    ax.set_title(f'Gemini Pricing Distribution: Israel (${int(israel_price)}) vs USA (${int(usa_price)})', 
                  fontsize=14, fontweight='bold', pad=20)
     
     plt.tight_layout()
