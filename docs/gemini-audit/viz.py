@@ -7,6 +7,12 @@ Reads CSV files and generates PNG charts.
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import sys
+
+# CSV file paths
+PERFORMANCE_CSV = 'performance_comparison.csv'
+PRICE_CSV = 'price_comparison.csv'
+REGRESSION_CSV = 'regression_timeline.csv'
 
 # Set style and color palette
 sns.set_style("whitegrid")
@@ -14,7 +20,7 @@ sns.set_palette("Set2")
 
 def create_performance_bars():
     """Generate performance comparison bar chart."""
-    df = pd.read_csv('performance_comparison.csv')
+    df = pd.read_csv(PERFORMANCE_CSV)
     
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -43,7 +49,7 @@ def create_performance_bars():
 
 def create_regression_timeline():
     """Generate regression timeline chart."""
-    df = pd.read_csv('regression_timeline.csv')
+    df = pd.read_csv(REGRESSION_CSV)
     
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -68,9 +74,18 @@ def create_regression_timeline():
 def create_price_pie():
     """Generate price comparison pie chart (Israel vs USA)."""
     # Focus on Israel vs USA comparison
-    df = pd.read_csv('price_comparison.csv')
-    israel_price = df[df['Country'] == 'Israel']['Monthly Price (USD)'].values[0]
-    usa_price = df[df['Country'] == 'USA']['Monthly Price (USD)'].values[0]
+    df = pd.read_csv(PRICE_CSV)
+    
+    # Get prices for Israel and USA with error handling
+    israel_data = df[df['Country'] == 'Israel']['Monthly Price (USD)']
+    usa_data = df[df['Country'] == 'USA']['Monthly Price (USD)']
+    
+    if israel_data.empty or usa_data.empty:
+        print("✗ Warning: Missing Israel or USA price data. Skipping price_pie.png")
+        return
+    
+    israel_price = israel_data.values[0]
+    usa_price = usa_data.values[0]
     
     countries = ['Israel', 'USA']
     prices = [israel_price, usa_price]
@@ -98,7 +113,7 @@ def create_price_pie():
 
 def create_price_country_bars():
     """Generate price comparison bar chart by country."""
-    df = pd.read_csv('price_comparison.csv')
+    df = pd.read_csv(PRICE_CSV)
     
     fig, ax = plt.subplots(figsize=(10, 6))
     
@@ -148,7 +163,10 @@ def main():
         
     except FileNotFoundError as e:
         print(f"\n✗ Error: Could not find required CSV file: {e}")
-        print("Please ensure you're running this script from the docs/gemini-audit/ directory.")
+        print("Please ensure:")
+        print("  1. You're running this script from the docs/gemini-audit/ directory")
+        print("  2. All required CSV files exist: performance_comparison.csv, price_comparison.csv, regression_timeline.csv")
+        sys.exit(1)
     except Exception as e:
         print(f"\n✗ Error generating visualizations: {e}")
         raise
