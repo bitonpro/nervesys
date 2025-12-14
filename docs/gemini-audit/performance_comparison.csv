@@ -1,0 +1,10 @@
+model,benchmark,score
+Gemini Advanced,HumanEval,82.1
+Gemini Advanced,GSM8K,88.3
+Gemini Advanced,MMLU,85.0
+GPT-4 Turbo,HumanEval,87.5
+GPT-4 Turbo,GSM8K,92.0
+GPT-4 Turbo,MMLU,86.4
+Claude 3 Opus,HumanEval,84.9
+Claude 3 Opus,GSM8K,90.7
+Claude 3 Opus,MMLU,86.8

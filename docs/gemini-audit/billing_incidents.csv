@@ -1,0 +1,3 @@
+date,region,charge_type,amount_usd,amount_local,currency,dispute_status,notes
+2024-11-15,Israel,Monthly Subscription,270,1500,ILS,Pending,"Customer charged 12x USA rate for identical service"
+2024-11-20,USA,Monthly Subscription,22,22,USD,Resolved,"Standard pricing applied correctly"
