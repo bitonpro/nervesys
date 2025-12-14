@@ -1,0 +1,4 @@
+Model,HumanEval,GSM8K,MMLU
+Gemini Advanced,71.9,92.0,90.0
+GPT-4 Turbo,87.6,94.2,86.4
+Claude 3 Opus,84.9,95.0,86.8
