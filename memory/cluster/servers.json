@@ -2,12 +2,43 @@
   "cluster": "ks7-flow",
   "updated": "2026-04-10",
   "servers": {
-    "storai": {"ip_public": "51.195.88.44", "ip_tailscale": "100.92.89.14", "role": "NFS-master", "user": "ubuntu"},
-    "cloudai": {"ip_public": "162.19.126.209", "ip_tailscale": "100.122.148.62", "role": "cloudai-OVH", "user": "ubuntu"},
-    "arcai": {"ip_public": "51.178.66.135", "ip_tailscale": "100.81.132.108", "role": "NAS-24TB-archive", "user": "ubuntu"},
-    "dgxsec": {"ip_tailscale": "100.78.185.72", "role": "DGX-GB10-128GB", "user": "yohayfix"},
-    "dgxmain": {"ip_tailscale": "100.124.217.84", "role": "DGX-GB10-128GB", "user": "yohayfix"},
-    "5060i": {"ip_tailscale": "100.78.111.114", "role": "RTX-5060Ti-home", "user": "yohay"}
+    "storai": {
+      "ip_public": "51.195.88.44",
+      "ip_tailscale": "100.92.89.14",
+      "role": "NFS-master",
+      "user": "ubuntu"
+    },
+    "cloudai": {
+      "ip_public": "162.19.126.209",
+      "ip_tailscale": "100.122.148.62",
+      "role": "cloudai-OVH",
+      "user": "ubuntu"
+    },
+    "arcai": {
+      "ip_public": "51.178.66.135",
+      "ip_tailscale": "100.81.132.108",
+      "role": "NAS-24TB-archive",
+      "user": "ubuntu"
+    },
+    "dgxsec": {
+      "ip_tailscale": "100.78.185.72",
+      "role": "DGX-GB10-128GB",
+      "user": "yohayfix",
+      "github_key": "SHA256:NA07sy6oRuFYLK3JWRG/RlgljiuyQ0DNZvcgbeug3Tg",
+      "github_key_added": "2026-04-10",
+      "roce_bw_gbs": 6.64,
+      "cluster_pair": "dgxmain"
+    },
+    "dgxmain": {
+      "ip_tailscale": "100.124.217.84",
+      "role": "DGX-GB10-128GB",
+      "user": "yohayfix"
+    },
+    "5060i": {
+      "ip_tailscale": "100.78.111.114",
+      "role": "RTX-5060Ti-home",
+      "user": "yohay"
+    }
   },
   "nfs": "100.92.89.14:/opt/ks7/claude-memory",
   "storj_bucket": "storj:a5060iai",
