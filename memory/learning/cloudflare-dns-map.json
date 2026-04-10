@@ -1,0 +1,498 @@
+{
+  "updated": "2026-04-10",
+  "zones": {
+    "annima.ai": [
+      {
+        "type": "A",
+        "name": "annima.ai",
+        "content": "185.230.63.107"
+      },
+      {
+        "type": "CNAME",
+        "name": "www.annima.ai",
+        "content": "pointing.wixdns.net"
+      }
+    ],
+    "yohay.ai": [
+      {
+        "type": "CNAME",
+        "name": "ai.yohay.ai",
+        "content": "tunnel:5060i"
+      },
+      {
+        "type": "CNAME",
+        "name": "app.yohay.ai",
+        "content": "tunnel:gama2"
+      },
+      {
+        "type": "CNAME",
+        "name": "arc.yohay.ai",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "aster.yohay.ai",
+        "content": "tunnel:5060i"
+      },
+      {
+        "type": "CNAME",
+        "name": "gama.yohay.ai",
+        "content": "tunnel:gama2"
+      },
+      {
+        "type": "CNAME",
+        "name": "ollama-arc.yohay.ai",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "ollama-gama.yohay.ai",
+        "content": "tunnel:gama2"
+      },
+      {
+        "type": "CNAME",
+        "name": "ollama.yohay.ai",
+        "content": "tunnel:5060i"
+      },
+      {
+        "type": "CNAME",
+        "name": "openclaw.yohay.ai",
+        "content": "tunnel:5060i"
+      },
+      {
+        "type": "CNAME",
+        "name": "owui.yohay.ai",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "stor.yohay.ai",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "www.yohay.ai",
+        "content": "yohay.ai"
+      },
+      {
+        "type": "CNAME",
+        "name": "yohay.ai",
+        "content": "tunnel:gama2"
+      },
+      {
+        "type": "MX",
+        "name": "yohay.ai",
+        "content": "aspmx.l.google.com"
+      },
+      {
+        "type": "MX",
+        "name": "yohay.ai",
+        "content": "alt1.aspmx.l.google.com"
+      },
+      {
+        "type": "MX",
+        "name": "yohay.ai",
+        "content": "alt4.aspmx.l.google.com"
+      },
+      {
+        "type": "MX",
+        "name": "yohay.ai",
+        "content": "alt3.aspmx.l.google.com"
+      },
+      {
+        "type": "MX",
+        "name": "yohay.ai",
+        "content": "alt2.aspmx.l.google.com"
+      },
+      {
+        "type": "TXT",
+        "name": "yohay.ai",
+        "content": "\"canva-domain-verify=5eb0c949-bcba-4625-9185-44175258d7e6\""
+      },
+      {
+        "type": "TXT",
+        "name": "yohay.ai",
+        "content": "\"v=spf1 include:_spf.google.com ~all\""
+      },
+      {
+        "type": "TXT",
+        "name": "yohay.ai",
+        "content": "\"google-site-verification=s2hqpZ-dOQgHOnzKL47wfehL8CCQDx8r-LjLZMMkPF8\""
+      }
+    ],
+    "yohayai.com": [
+      {
+        "type": "A",
+        "name": "deep.yohayai.com",
+        "content": "100.65.11.71"
+      },
+      {
+        "type": "A",
+        "name": "yohayai.com",
+        "content": "185.230.63.107"
+      },
+      {
+        "type": "CNAME",
+        "name": "analytics.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "api.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "arcai.yohayai.com",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "aster-arcai.yohayai.com",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "aster-dgxmain.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "aster-dgxsec.yohayai.com",
+        "content": "tunnel:dgxsec"
+      },
+      {
+        "type": "CNAME",
+        "name": "aster-gama2.yohayai.com",
+        "content": "tunnel:gama2"
+      },
+      {
+        "type": "CNAME",
+        "name": "aster-storai.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "chat.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "ci.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "claw-arcai.yohayai.com",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "claw-dgxmain.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "claw-dgxsec.yohayai.com",
+        "content": "tunnel:dgxsec"
+      },
+      {
+        "type": "CNAME",
+        "name": "claw-gama2.yohayai.com",
+        "content": "tunnel:gama2"
+      },
+      {
+        "type": "CNAME",
+        "name": "claw-storai.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "comfyui.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "cyber.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "dash-dgxmain.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "dash-dgxsec.yohayai.com",
+        "content": "tunnel:dgxsec"
+      },
+      {
+        "type": "CNAME",
+        "name": "dgxmain.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "dgxsec.yohayai.com",
+        "content": "tunnel:dgxsec"
+      },
+      {
+        "type": "CNAME",
+        "name": "draw.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "elk.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "finetune.yohayai.com",
+        "content": "tunnel:dgxsec"
+      },
+      {
+        "type": "CNAME",
+        "name": "frigate.yohayai.com",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "gama2.yohayai.com",
+        "content": "tunnel:gama2"
+      },
+      {
+        "type": "CNAME",
+        "name": "git.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "home.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "ks7.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "matrix.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "mdm-arcai.yohayai.com",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "mdm-dgxmain.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "mdm-dgxsec.yohayai.com",
+        "content": "tunnel:dgxsec"
+      },
+      {
+        "type": "CNAME",
+        "name": "mdm-gama2.yohayai.com",
+        "content": "tunnel:gama2"
+      },
+      {
+        "type": "CNAME",
+        "name": "mdm-storai.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "meet.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "monitor.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "n8n.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "nodered.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "nomad.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "nvr-arcai.yohayai.com",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "nvr.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "ollama-arcai.yohayai.com",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "ollama-dgxmain.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "ollama-dgxsec.yohayai.com",
+        "content": "tunnel:dgxsec"
+      },
+      {
+        "type": "CNAME",
+        "name": "openclaw.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "portainer.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "portal.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "registry.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "s3.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "sso.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "storai.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "uptime.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "vault.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "webui-arcai.yohayai.com",
+        "content": "tunnel:arcai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "webui-dgxmain.yohayai.com",
+        "content": "tunnel:dgxmain"
+      },
+      {
+        "type": "CNAME",
+        "name": "webui-dgxsec.yohayai.com",
+        "content": "tunnel:dgxsec"
+      },
+      {
+        "type": "CNAME",
+        "name": "webui-gama2.yohayai.com",
+        "content": "tunnel:gama2"
+      },
+      {
+        "type": "CNAME",
+        "name": "webui-storai.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "wiki.yohayai.com",
+        "content": "tunnel:storai-wp"
+      },
+      {
+        "type": "CNAME",
+        "name": "www.yohayai.com",
+        "content": "pointing.wixdns.net"
+      },
+      {
+        "type": "MX",
+        "name": "yohayai.com",
+        "content": "alt2.aspmx.l.google.com"
+      },
+      {
+        "type": "MX",
+        "name": "yohayai.com",
+        "content": "aspmx.l.google.com"
+      },
+      {
+        "type": "MX",
+        "name": "yohayai.com",
+        "content": "alt4.aspmx.l.google.com"
+      },
+      {
+        "type": "MX",
+        "name": "yohayai.com",
+        "content": "alt1.aspmx.l.google.com"
+      },
+      {
+        "type": "MX",
+        "name": "yohayai.com",
+        "content": "alt3.aspmx.l.google.com"
+      },
+      {
+        "type": "TXT",
+        "name": "yohayai.com",
+        "content": "\"v=spf1 include:_spf.google.com ~all\""
+      },
+      {
+        "type": "TXT",
+        "name": "yohayai.com",
+        "content": "\"google-site-verification=EtKRWkVzCqNUvjQa58DAg0C02r-59_e-oCozsq3mcmU\""
+      }
+    ]
+  },
+  "tunnels_healthy": [
+    "5060i",
+    "arcai-wp",
+    "dgxmain",
+    "dgxsec",
+    "gama2",
+    "storai-wp"
+  ],
+  "tunnels_deleted": [
+    "arcai",
+    "gama",
+    "storai"
+  ],
+  "security": {
+    "ssl": "strict",
+    "always_https": "on",
+    "min_tls": "1.2",
+    "tls_1_3": "on",
+    "security_level": "high",
+    "hsts": "15552000s+includeSubdomains",
+    "auto_https_rewrites": "on"
+  }
+}
