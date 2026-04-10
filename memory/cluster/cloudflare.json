@@ -1,0 +1,39 @@
+{
+  "account_id": "a182e69b048ebabb970ffd4e91cc741b",
+  "account_email": "meni@biton.pro",
+  "allowed_emails": ["meni@biton.pro", "bar@yohay.ai"],
+  "domains": ["yohay.ai", "yohayai.com", "annima.ai"],
+  "token_read_all": "cfat_i4OMDrDy8bAs1FLDNTBcRcEy6sKzwFpUbd4NsEanb883bc55",
+  "token_dns": "cfat_ZR94tXu5nOE6DX09O9XfB2SHW8ZUVcJrThlslVoZ0bd2d584",
+  "token_workers": "cfat_QAWA2APtc0Qc6VB5nXdft5ynFWWpVPIjsKLMzzJP2b5bdcf6",
+  "tunnels": {
+    "dgxsec": {
+      "id": "b29902f6-b799-41c8-a10e-aad389061f05",
+      "status": "healthy",
+      "urls": [
+        "webui-dgxsec.yohayai.com",
+        "ollama-dgxsec.yohayai.com",
+        "dash-dgxsec.yohayai.com",
+        "finetune.yohayai.com",
+        "claw-dgxsec.yohayai.com",
+        "aster-dgxsec.yohayai.com"
+      ]
+    },
+    "dgxmain": {
+      "id": "95fae914-8d4a-479a-8d6b-39e2a42ca563",
+      "status": "healthy",
+      "urls": [
+        "webui-dgxmain.yohayai.com",
+        "comfyui.yohayai.com",
+        "n8n.yohayai.com",
+        "nomad.yohayai.com",
+        "portainer.yohayai.com",
+        "git.yohayai.com",
+        "openclaw.yohayai.com",
+        "api.yohayai.com"
+      ]
+    }
+  },
+  "access": "Cloudflare Access — login via meni@biton.pro email OTP",
+  "updated": "2026-04-10"
+}
