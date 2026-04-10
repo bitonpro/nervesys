@@ -1,0 +1,3 @@
+- [Cluster Status](infra_cluster_status.md) — NFS mounts, server states, np05j tablet, gama-2 services (2026-04-10)
+- [User Yohay](user_yohay.md) — infra admin, Hebrew, prefers direct autonomous action
+- [Be Direct](feedback_be_direct.md) — decide and act, don't present options

@@ -15,14 +15,23 @@
     "cloudai": {
       "ip_public": "162.19.126.209",
       "ip_tailscale": "100.122.148.62",
-      "role": "cloudai-OVH",
-      "user": "ubuntu"
+      "role": "primary-brain-OVH",
+      "user": "ubuntu",
+      "hostname": "gama-2",
+      "github_key": "SHA256:L6VhsWHxrbpEHc7MwnKq1G/c2RwkVce+6OrUYeVVpU8",
+      "github_key_name": "GAMA-2AI",
+      "github_key_added": "2026-04-10",
+      "github_access": "read_write",
+      "asterisk": "primary-freepbx",
+      "cluster_role": "SIP-hub-brain"
     },
     "arcai": {
       "ip_public": "51.178.66.135",
       "ip_tailscale": "100.81.132.108",
       "role": "NAS-24TB-archive",
-      "user": "ubuntu"
+      "user": "ubuntu",
+      "github_key": "SHA256:L6VhsWHxrbpEHc7MwnKq1G/c2RwkVce+6OrUYeVVpU8",
+      "github_key_name": "GAMA-2AI"
     },
     "dgxsec": {
       "ip_tailscale": "100.78.185.72",
@@ -41,7 +50,9 @@
     "5060i": {
       "ip_tailscale": "100.78.111.114",
       "role": "RTX-5060Ti-home",
-      "user": "yohay"
+      "user": "yohay",
+      "github_key": "SHA256:L6VhsWHxrbpEHc7MwnKq1G/c2RwkVce+6OrUYeVVpU8",
+      "github_key_name": "GAMA-2AI"
     }
   },
   "nfs": "100.92.89.14:/opt/ks7/claude-memory",
