@@ -10,6 +10,6 @@
     "5060i": {"ip_tailscale": "100.78.111.114", "role": "RTX-5060Ti-home", "user": "yohay"}
   },
   "nfs": "100.92.89.14:/opt/ks7/claude-memory",
-  "storj_bucket": "storj:arcai",
+  "storj_bucket": "storj:a5060iai",
   "github": "git@github.com:bitonpro/nervesys.git"
 }
