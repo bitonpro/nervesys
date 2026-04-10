@@ -1,0 +1,46 @@
+{
+  "protocol_version": "1.0",
+  "created": "2026-04-10",
+  "log": [
+    {
+      "date": "2026-04-10",
+      "session": "security-emergency",
+      "topic": "storai SMB breach",
+      "opener": "cloudai",
+      "mistabar": "IPs 41.33.161.161 ו-185.214.65.74 מחוברים ל-Samba, לכן יש לחסום iptables + stop smbd מיד",
+      "accepted_by": "unanimous",
+      "executed_by": "cloudai",
+      "result": "success — zero data exfiltrated"
+    },
+    {
+      "date": "2026-04-10",
+      "session": "security-emergency",
+      "topic": "Vault exposed port 8200",
+      "opener": "cloudai",
+      "mistabar": "Vault dev-mode חושף token ב-ps aux + port 8200 על 0.0.0.0, לכן iptables block + Tailscale-only",
+      "accepted_by": "unanimous",
+      "executed_by": "cloudai",
+      "result": "success"
+    },
+    {
+      "date": "2026-04-10",
+      "session": "ivr-build",
+      "topic": "Asterisk sounds path",
+      "opener": "cloudai",
+      "mistabar": "Data directory הוא /usr/share/asterisk ולא /var/lib/asterisk, לכן קבצי IVR חייבים להיות שם",
+      "accepted_by": "unanimous",
+      "executed_by": "cloudai",
+      "result": "success — all 5 nodes IVR working"
+    },
+    {
+      "date": "2026-04-10",
+      "session": "ivr-build",
+      "topic": "chan_sip blocking PJSIP",
+      "opener": "cloudai",
+      "mistabar": "chan_sip תופס port 5060 לפני PJSIP — לכן noload chan_sip + הוסף PJSIP transport",
+      "accepted_by": "unanimous",
+      "executed_by": "cloudai",
+      "result": "success — all trunks Avail"
+    }
+  ]
+}
