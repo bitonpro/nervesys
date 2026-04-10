@@ -1,0 +1,27 @@
+{
+  "node": "lap5070ai",
+  "role": "sales-machine",
+  "description": "Dedicated Windows machine for client meetings and demos",
+  "hardware": {
+    "gpu": "12GB",
+    "screen": "premium display",
+    "cost_nis": 10000
+  },
+  "ip_tailscale": "100.75.17.29",
+  "user": "adsec",
+  "capabilities": [
+    "Canva design generation (MCP)",
+    "Gmail access (MCP)",
+    "Google Calendar (MCP)",
+    "SSH to all servers",
+    "Storj cloud storage",
+    "GitHub repos access",
+    "rclone configured",
+    "Video generation (via server SSH)"
+  ],
+  "storj": {
+    "bucket": "lap5070",
+    "gateway": "https://gateway.storjshare.io"
+  },
+  "added": "2026-04-10"
+}
