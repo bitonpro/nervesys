@@ -6,7 +6,11 @@
       "ip_public": "51.195.88.44",
       "ip_tailscale": "100.92.89.14",
       "role": "NFS-master",
-      "user": "ubuntu"
+      "user": "ubuntu",
+      "github_key": "SHA256:ZmB9d+o8CbYmXeqQSgX/fNGKbBUmqEmZo16D+e4+bT0",
+      "github_key_name": "KS7AISTOR",
+      "github_key_added": "2026-04-10",
+      "github_access": "read_write"
     },
     "cloudai": {
       "ip_public": "162.19.126.209",
