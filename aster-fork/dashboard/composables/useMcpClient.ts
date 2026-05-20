@@ -5,6 +5,21 @@ export const useMcpClient = () => {
   const devices = ref([])
   const error = ref(null)
 
+  // OpenClaw Integration
+  const openClawConfig = ref({
+    enabled: false,
+    endpoint: '',
+    authToken: '',
+    deliveryChannel: 'WhatsApp',
+    deliverTo: '',
+    events: {
+      notifications: true,
+      sms: true,
+      connected: true,
+      disconnected: true
+    }
+  })
+
   const connect = async (url) => {
     try {
       // Setup WebSocket connection to Sentinel MCP Server
@@ -23,11 +38,19 @@ export const useMcpClient = () => {
     ]
   }
 
+  const saveOpenClawConfig = async (config) => {
+    console.log('Saving OpenClaw configuration to MCP...', config)
+    openClawConfig.value = config
+    // POST config to MCP server backend
+  }
+
   return {
     isConnected,
     devices,
     error,
+    openClawConfig,
     connect,
-    fetchDevices
+    fetchDevices,
+    saveOpenClawConfig
   }
 }

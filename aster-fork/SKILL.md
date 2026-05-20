@@ -20,14 +20,16 @@
 ## Phase 4: Package Configuration
 - Update `mcp/package.json` with the new package name `@bitonpro/sentinel-mcp`, description, author, and bin commands.
 
-## Phase 5: Dashboard Rebrand
+## Phase 5: Dashboard Rebrand & OpenClaw Setup
 - Connect the newly created `dashboard` codebase in this `aster-fork` to the MCP.
 - Configure Nuxt UI (`app.config.ts`, `nuxt.config.ts`, `main.css`) to use the BitOn.Pro color palette and branding.
+- Setup OpenClaw webhook configuration views for Event Forwarding (WhatsApp/Telegram).
 
-## Phase 6: Android App Rebrand
+## Phase 6: Android App Rebrand & Integration
 - Update Android app ID to `pro.biton.sentinel` in `build.gradle.kts`.
 - Update app names and add Hebrew (`values-he`) resources.
 - Include the new icon, splash screen, and vector assets from the `design` folder.
+- Ensure WebSocket services forward notifications/SMS directly via MCP to OpenClaw.
 
 ## Phase 7: Verification
 - Search for leftover instances of `aster` or `Aster` in the rebranded files.
