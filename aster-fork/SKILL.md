@@ -44,3 +44,9 @@
 
 ## Phase 10: Build
 - Run `./gradlew assembleDebug` to build the test APK for the Sentinel Android app.
+
+## Phase 11: LibreChat & API Integration
+- Go to `https://librechat.yohay.ai/c/new` and configure the Sentinel MCP server.
+- Set Transport to `SSE` (Server-Sent Events) or `HTTPS`.
+- Integrate the Google AI Studio project API key (e.g., Gemini `gen-lang-client`) as needed for backend AI capabilities.
+- Ensure the MCP runs securely, as "Custom connectors are not verified by LibreChat".
